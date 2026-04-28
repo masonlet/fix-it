@@ -2,6 +2,8 @@
 
 **Play it:** [Wavedash](https://wavedash.com/games/fix-it) · [itch.io](https://masonlet.itch.io/fix-it)
 
+![Game Screenshot](./images/fixit.webp)
+
 A casual HTML5 arcade game where broken contraptions roll down a conveyor belt. Spot the faults, tap to inspect, and complete quick minigames to fix them before they slide off the edge. Start simple - pump a bike tire, screw a lightbulb - then face increasingly complex machines with multiple faults as the belt speeds up. You get 10 lives; each unfixed issue costs one.
 
 > Originally built for the [Gamedev.js Jam 2026](https://gamedevjs.com/jam/2026/) (theme: Machines) as my first game. The jam version lives at [fix-it-jam](https://github.com/masonlet/fix-it-jam); this repo is the continued development.
