@@ -26,8 +26,6 @@ interface TargetZone {
 }
 
 export class TimingMinigame {
-  public static useDefaultPopup = false;
-
   private scene:      MinigameScene;
   private onComplete: () => void;
   private onFail:     () => void;

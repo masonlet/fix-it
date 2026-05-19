@@ -22,8 +22,6 @@ const LAYOUT = {
 }
 
 export class PumpMinigame {
-  public static useDefaultPopup = false;
-
   private scene: MinigameScene;
   private onComplete: () => void;
   private pumpedDistance: number;

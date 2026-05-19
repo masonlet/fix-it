@@ -29,8 +29,6 @@ const COLOUR = {
 }
 
 export class SwipeMinigame {
-  public static useDefaultPopup = false;
-
   private scene:      MinigameScene;
   private onComplete: () => void;
   private cx:    number;

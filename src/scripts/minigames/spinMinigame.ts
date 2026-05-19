@@ -23,8 +23,6 @@ const COLOUR = {
 }
 
 export class SpinMinigame {
-  public static useDefaultPopup = false;
-
   private scene:      MinigameScene;
   private onComplete: () => void;
   private cx: number;

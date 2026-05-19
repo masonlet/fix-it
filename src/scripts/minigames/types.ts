@@ -10,4 +10,5 @@ export interface MinigameScene extends Scene {
     stop(key: string): unknown;
     sounds: Record<string, SoundInstance | undefined>;
   };
+  onFixComplete?(result: { fixed: boolean; complete: boolean; item: any }): void;
 }

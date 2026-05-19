@@ -11,8 +11,6 @@ const LAYOUT = {
 }
 
 export class DragMinigame {
-  public static useDefaultPopup = false;
-  
   private scene:      MinigameScene;
   private onComplete: () => void;
   private completed:  boolean;

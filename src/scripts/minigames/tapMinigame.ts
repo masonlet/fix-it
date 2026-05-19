@@ -20,8 +20,6 @@ interface InteractiveBox {
 }
 
 export class TapMinigame {
-  public static useDefaultPopup = false;
-
   private scene: MinigameScene;
   private onComplete: () => void;
   private remaining: number;
