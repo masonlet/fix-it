@@ -1,10 +1,5 @@
-import { Scene } from "phaser";
-
 import { DEPTH } from "../config/depth.ts";
-
-interface MinigameScene extends Scene {
-  audio: { play(key: string): unknown; };
-}
+import type { MinigameScene } from "./types.ts";
 
 const LAYOUT = {
   BG_SIZE_PCT: 0.5,
