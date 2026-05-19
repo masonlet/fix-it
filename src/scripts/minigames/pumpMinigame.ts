@@ -8,21 +8,21 @@ const TUNING = {
 
 const LAYOUT = {
   NARROW_WIDTH: 650,
-  PUMP_WIDTH_PCT: 0.2,
-  PUMP_WIDTH_PCT_NARROW: 0.4,
-  PUMP_HEIGHT_PCT: 0.4,
-  PUMP_HEIGHT_PCT_NARROW: 0.4,
+  PUMP_WIDTH_PCT:    0.20,
+  PUMP_HEIGHT_PCT:   0.40,
   HANDLE_HEIGHT_PCT: 0.065,
+  HANDLE_WIDTH_PCT:  0.70,
+  BAR_WIDTH_PCT:     0.08,
+  BAR_INSET_PCT:     0.85,
+  HANDLE_BOTTOM_LIMIT_PCT:  0.85,
+  PUMP_WIDTH_PCT_NARROW:    0.40,
+  PUMP_HEIGHT_PCT_NARROW:   0.40,
   HANDLE_HEIGHT_PCT_NARROW: 0.065,
-  HANDLE_WIDTH_PCT: 0.7,
-  HANDLE_BOTTOM_LIMIT_PCT: 0.85,
-  BAR_WIDTH_PCT: 0.08,
-  BAR_WIDTH_PCT_NARROW: 0.15,
-  BAR_INSET_PCT: 0.85,
+  BAR_WIDTH_PCT_NARROW:     0.15,
 }
 
 export class PumpMinigame {
-  static useDefaultPopup = false;
+  public static useDefaultPopup = false;
 
   private scene: MinigameScene;
   private onComplete: () => void;

@@ -7,13 +7,13 @@ const TUNING = {
 
 const LAYOUT = {
   NARROW_WIDTH: 650,
-  PIPE_SIZE_PCT: 0.4,
-  PIPE_SIZE_PCT_NARROW: 0.8,
-  VALVE_SIZE_PCT: 0.4,
-  VALVE_SIZE_PCT_NARROW: 0.8,
+  PIPE_SIZE_PCT:   0.40,
+  VALVE_SIZE_PCT:  0.40,
   RING_RADIUS_PCT: 0.15,
-  RING_RADIUS_PCT_NARROW: 0.28,
   RING_THICKNESS_PCT: 0.015,
+  PIPE_SIZE_PCT_NARROW:      0.80,
+  VALVE_SIZE_PCT_NARROW:     0.80,
+  RING_RADIUS_PCT_NARROW:    0.28,
   RING_THICKNESS_PCT_NARROW: 0.025,
 }
 
@@ -23,7 +23,7 @@ const COLOUR = {
 }
 
 export class SpinMinigame {
-  static useDefaultPopup = false;
+  public static useDefaultPopup = false;
 
   private scene:      MinigameScene;
   private onComplete: () => void;

@@ -2,16 +2,16 @@ import { DEPTH } from "../config/depth.ts";
 import type { MinigameScene } from "./types.ts";
 
 const LAYOUT = {
-  BG_SIZE_PCT: 0.5,
-  PIECE_SIZE_PCT: 0.1,
-  SLOT_SIZE_PCT: 0.12,
+  BG_SIZE_PCT:    0.50,
+  PIECE_SIZE_PCT: 0.10,
+  SLOT_SIZE_PCT:  0.12,
   START_OFFSET_X_PCT: -0.15,
-  SLOT_OFFSET_X_PCT: 0.15,
-  SNAP_TOLERANCE_PCT: 0.5,
+  SLOT_OFFSET_X_PCT:   0.15,
+  SNAP_TOLERANCE_PCT:  0.50,
 }
 
 export class DragMinigame {
-  static useDefaultPopup = false;
+  public static useDefaultPopup = false;
   
   private scene:      MinigameScene;
   private onComplete: () => void;
