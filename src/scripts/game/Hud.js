@@ -1,4 +1,4 @@
-import { HUD } from "./config/hud.ts";
+import { HUD } from "../config/hud.ts";
 
 export class Hud {
   constructor (scene) {

@@ -1,6 +1,6 @@
-import { BELT } from "./config/belt.ts";
-import { GAME } from "./config/game.ts";
-import { MINIGAME } from "./config/minigame.ts";
+import { BELT } from "../config/belt.ts";
+import { GAME } from "../config/game.ts";
+import { MINIGAME } from "../config/minigame.ts";
 
 export class Difficulty {
   update (elapsedTime) {

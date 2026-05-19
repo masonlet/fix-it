@@ -1,5 +1,5 @@
-import { DEPTH } from "./config/depth.ts";
-import { BELT } from "./config/belt.ts";
+import { DEPTH } from "../config/depth.ts";
+import { BELT } from "../config/belt.ts";
 
 export class ConveyorBelt {
   constructor (scene) {

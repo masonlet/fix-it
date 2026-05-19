@@ -1,7 +1,8 @@
 import { Scene } from 'phaser';
 import { YouTubePlayables } from '../YouTubePlayables';
 import { WaveDash } from '../WaveDash';
-import { Audio } from '../Audio';
+
+import { Audio } from '../game/Audio';
 
 export class GameOver extends Scene {
   constructor () {

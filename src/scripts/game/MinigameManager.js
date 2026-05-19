@@ -1,17 +1,17 @@
-import { DEPTH } from "./config/depth.ts";
-import { POPUP } from "./config/popup.ts";
-import { TIMER } from "./config/timer.ts";
-import { INDICATOR } from "./config/indicator.ts";
+import { DEPTH } from "../config/depth.ts";
+import { POPUP } from "../config/popup.ts";
+import { TIMER } from "../config/timer.ts";
+import { INDICATOR } from "../config/indicator.ts";
 
-import { MINIGAME } from "./config/minigame.ts";
-import { MINIGAME_TYPES } from "./config/minigameTypes.ts";
+import { MINIGAME } from "../config/minigame.ts";
+import { MINIGAME_TYPES } from "../config/minigameTypes.ts";
 
-import { TapMinigame } from "./minigames/TapMinigame";
-import { PumpMinigame } from "./minigames/PumpMinigame";
-import { DragMinigame } from "./minigames/DragMinigame";
-import { SpinMinigame } from "./minigames/SpinMinigame";
-import { SwipeMinigame } from "./minigames/SwipeMinigame";
-import { TimingMinigame } from "./minigames/TimingMinigame";
+import { TapMinigame } from "../minigames/TapMinigame";
+import { PumpMinigame } from "../minigames/PumpMinigame";
+import { DragMinigame } from "../minigames/DragMinigame";
+import { SpinMinigame } from "../minigames/SpinMinigame";
+import { SwipeMinigame } from "../minigames/SwipeMinigame";
+import { TimingMinigame } from "../minigames/TimingMinigame";
 
 const MINIGAMES = {
   [MINIGAME_TYPES.TAP]: TapMinigame,

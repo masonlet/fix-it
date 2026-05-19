@@ -1,13 +1,14 @@
 import { Scene } from "phaser";
-import { Hud } from "../Hud";
-import { ConveyorBelt } from "../ConveyorBelt";
-import { ItemSpawner } from "../ItemSpawner";
-import { MinigameManager } from "../MinigameManager";
-import { Difficulty } from "../Difficulty";
-import { Audio } from "../Audio";
 
 import { GAME } from "../config/game.ts";
 import { BELT } from "../config/belt.ts";
+
+import { Hud } from "../game/Hud";
+import { ConveyorBelt } from "../game/ConveyorBelt";
+import { ItemSpawner } from "../game/ItemSpawner";
+import { MinigameManager } from "../game/MinigameManager";
+import { Difficulty } from "../game/Difficulty";
+import { Audio } from "../game/Audio";
 
 const AUDIO_KEYS = [
   "oof", "click",
