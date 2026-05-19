@@ -4,7 +4,7 @@ import { GAME } from "../config/game.ts";
 import { BELT } from "../config/belt.ts";
 
 import { Hud } from "../game/Hud";
-import { ConveyorBelt } from "../game/ConveyorBelt";
+import { ConveyorBelt } from "../game/conveyorBelt.ts";
 import { ItemSpawner } from "../game/ItemSpawner";
 import { MinigameManager } from "../game/MinigameManager";
 import { Difficulty } from "../game/Difficulty";
