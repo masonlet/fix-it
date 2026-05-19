@@ -1,10 +1,10 @@
-import { Boot } from './scenes/Boot';
-import { Preloader } from './scenes/Preloader';
-import { MainMenu } from './scenes/MainMenu';
-import { Game } from './scenes/Game';
-import { GameOver } from './scenes/GameOver';
-import { YouTubePlayables } from './YouTubePlayables';
-import { WaveDash } from './WaveDash';
+import { Boot } from './scripts/scenes/Boot';
+import { Preloader } from './scripts/scenes/Preloader';
+import { MainMenu } from './scripts/scenes/MainMenu';
+import { Game } from './scripts/scenes/Game';
+import { GameOver } from './scripts/scenes/GameOver';
+import { YouTubePlayables } from './scripts/YouTubePlayables';
+import { WaveDash } from './scripts/WaveDash';
 
 const config = {
   type: Phaser.AUTO,
