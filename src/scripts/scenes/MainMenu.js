@@ -1,5 +1,5 @@
 import { Scene } from "phaser";
-import { YouTubePlayables } from "../YouTubePlayables";
+import { YouTubePlayables } from "../youTubePlayables.ts";
 
 import { Audio } from "../game/Audio";
 

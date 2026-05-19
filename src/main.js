@@ -1,4 +1,4 @@
-import { YouTubePlayables } from './scripts/YouTubePlayables';
+import { YouTubePlayables } from './scripts/youTubePlayables.ts';
 import { WaveDash } from './scripts/waveDash.ts';
 
 import { Boot } from './scripts/scenes/Boot';
