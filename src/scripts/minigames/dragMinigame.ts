@@ -1,4 +1,10 @@
+import { Scene } from "phaser";
+
 import { DEPTH } from "../config/depth.ts";
+
+interface MinigameScene extends Scene {
+  audio: { play(key: string): unknown; };
+}
 
 const LAYOUT = {
   BG_SIZE_PCT: 0.5,
@@ -12,7 +18,32 @@ const LAYOUT = {
 export class DragMinigame {
   static useDefaultPopup = false;
   
-  constructor (scene, cx, cy, onComplete) {
+  private scene:      MinigameScene;
+  private onComplete: () => void;
+  private completed:  boolean;
+
+  private startX: number;
+  private startY: number;
+  private slotX:  number;
+  private slotY:  number;
+  private snapTolerance: number;
+
+  private bg:    Phaser.GameObjects.Image;
+  private slot:  Phaser.GameObjects.Image;
+  private piece: Phaser.GameObjects.Image;
+
+  private onDrag: (
+    pointer:    Phaser.Input.Pointer,
+    gameObject: Phaser.GameObjects.GameObject,
+    dragX: number,
+    dragY: number
+  ) => void;
+  private onDragEnd: (
+    pointer:    Phaser.Input.Pointer,
+    gameObject: Phaser.GameObjects.GameObject
+  ) => void;
+
+  constructor (scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
     this.scene = scene;
     this.onComplete = onComplete;
     this.completed = false;
@@ -72,7 +103,7 @@ export class DragMinigame {
     scene.input.on("dragend", this.onDragEnd);
   }
 
-  destroy () {
+  public destroy(): void {
     this.scene.input.off("drag", this.onDrag);
     this.scene.input.off("dragend", this.onDragEnd);
     this.bg.destroy();
@@ -80,26 +111,25 @@ export class DragMinigame {
     this.slot.destroy();
   }
 
-  onResize (width, height) {
+  public onResize(width: number, height: number): void {
     const cx = width / 2;
     const cy = height / 2;
-    const bgSize = width * LAYOUT.BG_SIZE_PCT;
+    const bgSize    = width * LAYOUT.BG_SIZE_PCT;
     const pieceSize = width * LAYOUT.PIECE_SIZE_PCT;
-    const slotSize = width * LAYOUT.SLOT_SIZE_PCT;
+    const slotSize  = width * LAYOUT.SLOT_SIZE_PCT;
 
     this.startX = cx + width * LAYOUT.START_OFFSET_X_PCT;
     this.startY = cy;
-    this.slotX = cx + width * LAYOUT.SLOT_OFFSET_X_PCT;
-    this.slotY = cy;
+    this.slotX  = cx + width * LAYOUT.SLOT_OFFSET_X_PCT;
+    this.slotY  = cy;
     this.snapTolerance = pieceSize * LAYOUT.SNAP_TOLERANCE_PCT;
 
     this.bg.setPosition(cx, cy).setDisplaySize(bgSize, bgSize);
     this.slot.setPosition(this.slotX, this.slotY).setDisplaySize(slotSize, slotSize);
-    if (this.completed) {
-      this.piece.setPosition(this.slotX, this.slotY);
-    } else {
-      this.piece.setPosition(this.startX, this.startY);
-    }
+
+    if (this.completed) this.piece.setPosition(this.slotX,  this.slotY);
+    else                this.piece.setPosition(this.startX, this.startY);
+
     this.piece.setDisplaySize(pieceSize, pieceSize);
   }
 }
