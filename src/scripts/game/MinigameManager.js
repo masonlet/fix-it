@@ -9,7 +9,7 @@ import { MINIGAME_TYPES } from "../config/minigameTypes.ts";
 import { TapMinigame } from "../minigames/TapMinigame";
 import { PumpMinigame } from "../minigames/PumpMinigame";
 import { DragMinigame } from "../minigames/dragMinigame.ts";
-import { SpinMinigame } from "../minigames/SpinMinigame";
+import { SpinMinigame } from "../minigames/spinMinigame.ts";
 import { SwipeMinigame } from "../minigames/SwipeMinigame";
 import { TimingMinigame } from "../minigames/TimingMinigame";
 
