@@ -3,7 +3,7 @@ import { Scene } from "phaser";
 import { GAME } from "../config/game.ts";
 import { BELT } from "../config/belt.ts";
 
-import { Hud } from "../game/Hud";
+import { Hud } from "../game/hud.ts";
 import { ConveyorBelt } from "../game/conveyorBelt.ts";
 import { ItemSpawner } from "../game/ItemSpawner";
 import { MinigameManager } from "../game/MinigameManager";

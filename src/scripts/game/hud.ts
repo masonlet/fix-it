@@ -1,7 +1,16 @@
+import { Scene } from "phaser";
+
 import { HUD } from "../config/hud.ts";
 
 export class Hud {
-  constructor (scene) {
+  private scene: Scene;
+  private lives: number;
+  private width: number;
+  private iconImages: Phaser.GameObjects.Image[];
+  private livesText: Phaser.GameObjects.Text;
+  private scoreText: Phaser.GameObjects.Text;
+
+  constructor (scene: Scene) {
     this.scene = scene;
     this.lives = 0;
     this.width = scene.scale.width;
@@ -20,12 +29,12 @@ export class Hud {
     }).setOrigin(0.5, 0);
   }
 
-  setLives (lives) {
+  setLives (lives: number): void {
     this.lives = lives;
     this.#renderLives();
   }
 
-  #renderLives () {
+  #renderLives (): void {
     this.iconImages.forEach(img => img.destroy());
     this.iconImages = [];
 
@@ -51,11 +60,11 @@ export class Hud {
     }
   }
 
-  setScore (score) {
+  setScore (score: number): void {
     this.scoreText.setText(`Score: ${score}`);
   }
 
-  handleResize (width) {
+  handleResize (width: number): void {
     this.width = width;
     this.livesText.setPosition(width * HUD.LAYOUT.LIVES_X_PCT, HUD.LAYOUT.Y);
     this.scoreText.setPosition(width * HUD.LAYOUT.SCORE_X_PCT, HUD.LAYOUT.Y);
