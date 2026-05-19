@@ -28,7 +28,7 @@ YouTubePlayables.boot(async () => {
   const game = new Phaser.Game(config);
   await WaveDash.boot();
 
-  const applyAudioState = (enabled) => { game.sound.mute = !enabled; }
+  const applyAudioState = (enabled: boolean) => { game.sound.mute = !enabled; }
   applyAudioState(YouTubePlayables.isAudioEnabled());
   YouTubePlayables.setAudioChangeCallback(applyAudioState);
 
