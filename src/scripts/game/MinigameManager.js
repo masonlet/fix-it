@@ -11,7 +11,7 @@ import { PumpMinigame } from "../minigames/pumpMinigame.ts";
 import { DragMinigame } from "../minigames/dragMinigame.ts";
 import { SpinMinigame } from "../minigames/spinMinigame.ts";
 import { SwipeMinigame } from "../minigames/swipeMinigame.ts";
-import { TimingMinigame } from "../minigames/TimingMinigame";
+import { TimingMinigame } from "../minigames/timingMinigame.ts";
 
 const MINIGAMES = {
   [MINIGAME_TYPES.TAP]: TapMinigame,
