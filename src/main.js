@@ -4,7 +4,7 @@ import { Boot      } from './scripts/scenes/boot.ts';
 import { Preloader } from './scripts/scenes/preloader.ts';
 import { MainMenu  } from './scripts/scenes/mainMenu.ts';
 import { Game      } from './scripts/scenes/Game';
-import { GameOver  } from './scripts/scenes/GameOver';
+import { GameOver  } from './scripts/scenes/gameOver.ts';
 
 const config = {
   type: Phaser.AUTO,
