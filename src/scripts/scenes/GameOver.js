@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
-import { YouTubePlayables } from '../youTubePlayables.ts';
-import { WaveDash } from '../waveDash.ts';
+import { YouTubePlayables } from '../sdk/youTubePlayables.ts';
+import { WaveDash } from '../sdk/waveDash.ts';
 
 import { Audio } from '../game/Audio';
 

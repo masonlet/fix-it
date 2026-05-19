@@ -1,5 +1,5 @@
-import { YouTubePlayables } from './scripts/youTubePlayables.ts';
-import { WaveDash } from './scripts/waveDash.ts';
+import { YouTubePlayables } from './scripts/sdk/youTubePlayables.ts';
+import { WaveDash } from './scripts/sdk/waveDash.ts';
 
 import { Boot } from './scripts/scenes/Boot';
 import { Preloader } from './scripts/scenes/Preloader';
