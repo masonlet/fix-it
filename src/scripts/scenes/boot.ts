@@ -1,4 +1,4 @@
-import { Scene } from "phaser";
+import { Scene            } from "phaser";
 import { YouTubePlayables } from "../sdk/youTubePlayables.ts";
 
 export class Boot extends Scene {
