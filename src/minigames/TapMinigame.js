@@ -1,5 +1,5 @@
-import { DEPTH } from "../config/Depth";
-import { INDICATOR } from "../config/Indicator";
+import { DEPTH } from "../config/depth.ts";
+import { INDICATOR } from "../config/indicator.ts";
 
 const LAYOUT = {
   NARROW_WIDTH: 650,

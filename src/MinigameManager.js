@@ -1,10 +1,10 @@
-import { DEPTH } from "./config/Depth";
-import { POPUP } from "./config/Popup";
-import { TIMER } from "./config/Timer";
-import { INDICATOR } from "./config/Indicator";
+import { DEPTH } from "./config/depth.ts";
+import { POPUP } from "./config/popup.ts";
+import { TIMER } from "./config/timer.ts";
+import { INDICATOR } from "./config/indicator.ts";
 
-import { MINIGAME } from "./config/Minigame";
-import { MINIGAME_TYPES } from "./config/MinigameTypes";
+import { MINIGAME } from "./config/minigame.ts";
+import { MINIGAME_TYPES } from "./config/minigameTypes.ts";
 
 import { TapMinigame } from "./minigames/TapMinigame";
 import { PumpMinigame } from "./minigames/PumpMinigame";

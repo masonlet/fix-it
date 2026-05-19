@@ -1,4 +1,4 @@
-import { DEPTH } from "../config/Depth";
+import { DEPTH } from "../config/depth.ts";
 
 const LAYOUT = {
   BG_SIZE_PCT: 0.5,

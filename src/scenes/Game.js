@@ -6,8 +6,8 @@ import { MinigameManager } from "../MinigameManager";
 import { Difficulty } from "../Difficulty";
 import { Audio } from "../Audio";
 
-import { GAME } from "../config/Game";
-import { BELT } from "../config/Belt";
+import { GAME } from "../config/game.ts";
+import { BELT } from "../config/belt.ts";
 
 const AUDIO_KEYS = [
   "oof", "click",

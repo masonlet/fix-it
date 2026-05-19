@@ -1,4 +1,4 @@
-import { DEPTH } from "../config/Depth";
+import { DEPTH } from "../config/depth.ts";
 
 const TUNING = {
   REQUIRED_ROTATION_DEG: 2000,

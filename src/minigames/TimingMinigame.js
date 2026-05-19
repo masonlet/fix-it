@@ -1,4 +1,4 @@
-import { DEPTH } from "../config/Depth";
+import { DEPTH } from "../config/depth.ts";
 
 const LAYOUT = {
   GAUGE_SIZE_MULT: 2.4,

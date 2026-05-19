@@ -1,10 +1,10 @@
-import { DEPTH } from "./config/Depth";
-import { BELT } from "./config/Belt";
-import { ITEM } from "./config/Item";
-import { GAME } from "./config/Game";
-import { INDICATOR } from "./config/Indicator";
-import { ITEM_SPRITES } from "./config/ItemSprites";
-import { MINIGAME_TYPES } from "./config/MinigameTypes";
+import { DEPTH } from "./config/depth.ts";
+import { BELT } from "./config/belt.ts";
+import { ITEM } from "./config/item.ts";
+import { GAME } from "./config/game.ts";
+import { INDICATOR } from "./config/indicator.ts";
+import { ITEM_SPRITES } from "./config/itemSprites.ts";
+import { MINIGAME_TYPES } from "./config/minigameTypes.ts";
 const TYPES = Object.values(MINIGAME_TYPES);
 
 export class ItemSpawner {
