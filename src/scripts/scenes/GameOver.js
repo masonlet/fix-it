@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { YouTubePlayables } from '../sdk/youTubePlayables.ts';
 import { WaveDash } from '../sdk/waveDash.ts';
 
-import { Audio } from '../game/Audio';
+import { Audio } from '../game/audio.ts';
 
 export class GameOver extends Scene {
   constructor () {

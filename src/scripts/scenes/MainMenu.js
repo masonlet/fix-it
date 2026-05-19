@@ -1,7 +1,7 @@
 import { Scene } from "phaser";
 import { YouTubePlayables } from "../sdk/youTubePlayables.ts";
 
-import { Audio } from "../game/Audio";
+import { Audio } from "../game/audio.ts";
 
 export class MainMenu extends Scene {
   constructor () {

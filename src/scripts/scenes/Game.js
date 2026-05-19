@@ -8,7 +8,7 @@ import { ConveyorBelt } from "../game/ConveyorBelt";
 import { ItemSpawner } from "../game/ItemSpawner";
 import { MinigameManager } from "../game/MinigameManager";
 import { Difficulty } from "../game/Difficulty";
-import { Audio } from "../game/Audio";
+import { Audio } from "../game/audio.ts";
 
 const AUDIO_KEYS = [
   "oof", "click",
