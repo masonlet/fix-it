@@ -2,7 +2,7 @@ import { YouTubePlayables } from './scripts/sdk/youTubePlayables.ts';
 import { WaveDash         } from './scripts/sdk/waveDash.ts';
 import { Boot      } from './scripts/scenes/boot.ts';
 import { Preloader } from './scripts/scenes/preloader.ts';
-import { MainMenu  } from './scripts/scenes/MainMenu';
+import { MainMenu  } from './scripts/scenes/mainMenu.ts';
 import { Game      } from './scripts/scenes/Game';
 import { GameOver  } from './scripts/scenes/GameOver';
 
