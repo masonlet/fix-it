@@ -6,8 +6,8 @@ import { INDICATOR } from "../config/indicator.ts";
 import { MINIGAME } from "../config/minigame.ts";
 import { MINIGAME_TYPES } from "../config/minigameTypes.ts";
 
-import { TapMinigame } from "../minigames/TapMinigame";
-import { PumpMinigame } from "../minigames/PumpMinigame";
+import { TapMinigame } from "../minigames/tapMinigame.ts";
+import { PumpMinigame } from "../minigames/pumpMinigame.ts";
 import { DragMinigame } from "../minigames/dragMinigame.ts";
 import { SpinMinigame } from "../minigames/spinMinigame.ts";
 import { SwipeMinigame } from "../minigames/swipeMinigame.ts";
