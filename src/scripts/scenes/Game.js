@@ -7,7 +7,7 @@ import { Hud } from "../game/Hud";
 import { ConveyorBelt } from "../game/conveyorBelt.ts";
 import { ItemSpawner } from "../game/ItemSpawner";
 import { MinigameManager } from "../game/MinigameManager";
-import { Difficulty } from "../game/Difficulty";
+import { Difficulty } from "../game/difficulty.ts";
 import { Audio } from "../game/audio.ts";
 
 const AUDIO_KEYS = [

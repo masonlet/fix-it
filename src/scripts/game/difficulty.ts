@@ -2,8 +2,14 @@ import { BELT } from "../config/belt.ts";
 import { GAME } from "../config/game.ts";
 import { MINIGAME } from "../config/minigame.ts";
 
+interface DifficultyMetrics {
+  beltSpeed: number;
+  spawnInterval: number;
+  minigameTimeMax: number;
+}
+
 export class Difficulty {
-  update (elapsedTime) {
+  update (elapsedTime: number): DifficultyMetrics {
     return {
       beltSpeed: Math.max(
         BELT.TUNING.SPEED_MIN,
