@@ -1,10 +1,11 @@
+import { YouTubePlayables } from './scripts/YouTubePlayables';
+import { WaveDash } from './scripts/waveDash.ts';
+
 import { Boot } from './scripts/scenes/Boot';
 import { Preloader } from './scripts/scenes/Preloader';
 import { MainMenu } from './scripts/scenes/MainMenu';
 import { Game } from './scripts/scenes/Game';
 import { GameOver } from './scripts/scenes/GameOver';
-import { YouTubePlayables } from './scripts/YouTubePlayables';
-import { WaveDash } from './scripts/WaveDash';
 
 const config = {
   type: Phaser.AUTO,

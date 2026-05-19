@@ -1,6 +1,6 @@
 import { Scene } from "phaser";
 import { YouTubePlayables } from "../YouTubePlayables";
-import { WaveDash } from "../WaveDash";
+import { WaveDash } from "../waveDash.ts";
 
 const AUDIO_BASE = "assets/audio/";
 const AUDIO = [
