@@ -1,29 +1,29 @@
 {
-    "name": "template-youtube-playables",
-    "description": "A Phaser 3 template for creating YouTube Playables.",
-    "version": "1.0.0",
-    "type": "module",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/phaserjs/template-youtube-playables.git"
-    },
-    "author": "Phaser Studio <support@phaser.io> (https://phaser.io/)",
-    "license": "MIT",
-    "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
-    "bugs": {
-        "url": "https://github.com/phaserjs/template-youtube-playables/issues"
-    },
-    "homepage": "https://github.com/phaserjs/template-youtube-playables#readme",
-    "scripts": {
-        "dev": "vite --config vite/config.dev.mjs",
-        "build": "vite build --config vite/config.prod.mjs",
-        "preview": "vite preview"
-    },
-    "devDependencies": {
-        "@wvdsh/sdk-js": "^1.2.4",
-        "phaser": "^3.86.0",
-        "terser": "^5.34.1",
-        "typescript": "^6.0.3",
-        "vite": "^5.4.8"
-    }
+  "name": "fix-it",
+  "description": "A casual HTML5 arcade game where you spot and fix faulty machines on a conveyor belt before they slide off.",
+  "version": "1.0.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/masonlet/fix-it.git"
+  },
+  "author": "Masonlet <masonletoile@hotmail.com> (https://github.com/masonlet)",
+  "license": "MIT",
+  "licenseUrl": "https://github.com/masonlet/fix-it/blob/main/LICENSE",
+  "bugs": {
+    "url": "https://github.com/masonlet/fix-it/issues"
+  },
+  "homepage": "https://wavedash.com/games/fix-it",
+  "scripts": {
+    "dev": "vite --config vite/config.dev.mjs",
+    "build": "vite build --config vite/config.prod.mjs",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@wvdsh/sdk-js": "^1.2.4",
+    "phaser": "^3.86.0",
+    "terser": "^5.34.1",
+    "typescript": "^6.0.3",
+    "vite": "^5.4.8"
+  }
 }
