@@ -1,5 +1,18 @@
 import { Scene } from "phaser";
 
+export interface ActiveItem {
+  paused?:     boolean;
+  faults:      number;
+  totalFaults: number;
+  faultTypes:  string[];
+  indicators:  Array<{ insert: Phaser.GameObjects.Image }>;
+}
+
+export interface GameInitData {
+  score?: number;
+  time?:  number;
+}
+
 export interface SoundInstance {
   isPlaying: boolean;
 }

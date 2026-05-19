@@ -1,5 +1,5 @@
 import { DEPTH } from "../config/depth.ts";
-import type { MinigameScene } from "./types.ts";
+import type { MinigameScene } from "../game/types.ts";
 
 const TUNING = {
   REQUIRED_ROTATION_DEG: 2000,

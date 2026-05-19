@@ -1,6 +1,6 @@
 import { DEPTH } from "../config/depth.ts";
 import { INDICATOR } from "../config/indicator.ts";
-import type { MinigameScene } from "./types.ts";
+import type { MinigameScene } from "../game/types.ts";
 
 const LAYOUT = {
   NARROW_WIDTH: 650,

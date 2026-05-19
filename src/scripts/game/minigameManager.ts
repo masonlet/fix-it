@@ -6,28 +6,18 @@ import { INDICATOR } from "../config/indicator.ts";
 import { MINIGAME }       from "../config/minigame.ts";
 import { MINIGAME_TYPES } from "../config/minigameTypes.ts";
 
+import type { MinigameScene, ActiveItem } from "./types.ts";
 import { TapMinigame }    from "../minigames/tapMinigame.ts";
 import { PumpMinigame }   from "../minigames/pumpMinigame.ts";
 import { DragMinigame }   from "../minigames/dragMinigame.ts";
 import { SpinMinigame }   from "../minigames/spinMinigame.ts";
 import { SwipeMinigame }  from "../minigames/swipeMinigame.ts";
 import { TimingMinigame } from "../minigames/timingMinigame.ts";
-import type { MinigameScene } from "../minigames/types.ts";
 
 interface MinigameInstance {
   destroy(): void;
   update?(delta: number): void;
   onResize?(width: number, height: number): void;
-}
-
-interface ActiveItem {
-  paused: boolean;
-  faults: number;
-  totalFaults: number;
-  faultTypes: string[];
-  indicators: Array<{
-    insert: Phaser.GameObjects.Image;
-  }>;
 }
 
 type MinigameConstructor = new (
@@ -153,14 +143,14 @@ export class MinigameManager {
     return result;
   }
 
-  fail () {
+  public fail (): void {
     if (!this.activeItem) return;
     this.scene.audio.play("fail");
     this.activeItem.paused = false;
     this.close();
   }
 
-  close () {
+  public close (): void {
     this.overlay?.destroy();    this.overlay = null;
     this.popup?.destroy();      this.popup  = null;
     this.timerBarBg?.destroy(); this.timerBarBg = null;
@@ -171,6 +161,8 @@ export class MinigameManager {
       this.currentMinigame = null;
     }
   }
+
+  public set maxTime(value: number) { this.timeMax = value; }
 
   public handleResize(width: number, height: number): void {
     if (!this.activeItem) return;

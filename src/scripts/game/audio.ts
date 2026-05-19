@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 
 export class Audio {
   private scene: Scene;
-  private sounds: Record<string, Phaser.Sound.BaseSound | undefined>;
+  public sounds: Record<string, Phaser.Sound.BaseSound | undefined>;
 
   constructor (scene: Scene) {
     this.scene = scene;

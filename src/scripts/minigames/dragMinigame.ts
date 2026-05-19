@@ -1,5 +1,5 @@
 import { DEPTH } from "../config/depth.ts";
-import type { MinigameScene } from "./types.ts";
+import type { MinigameScene } from "../game/types.ts";
 
 const LAYOUT = {
   BG_SIZE_PCT:    0.50,
