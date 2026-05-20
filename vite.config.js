@@ -7,7 +7,12 @@ export default defineConfig(({ mode }) => {
     root: 'src',
     publicDir: '../public',
     base: './',
+
     logLevel: isProd ? 'warning' : 'info',
+    esbuild: isProd ? {
+      legalComments: 'none'
+    } : {},
+
     build: {
       outDir: '../dist',
       emptyOutDir: true,
@@ -17,13 +22,7 @@ export default defineConfig(({ mode }) => {
             phaser: ['phaser']
           }
         }
-      },
-      minify: isProd ? 'terser' : false,
-      terserOptions: isProd ? {
-        compress: { passes: 2 },
-        mangle: true,
-        format: { comments: false }
-      } : undefined
+      }
     },
     server: {
       port: 8080
