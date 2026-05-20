@@ -1,17 +1,10 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production';
-
+export default defineConfig(() => {
   return {
     root: 'src',
     publicDir: '../public',
     base: './',
-
-    logLevel: isProd ? 'warning' : 'info',
-    esbuild: isProd ? {
-      legalComments: 'none'
-    } : {},
 
     build: {
       outDir: '../dist',
