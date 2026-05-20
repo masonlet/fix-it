@@ -36,8 +36,9 @@ npm install
 ### 2. Run Locally
 
 ```bash
-npm run dev   # Local development server
-npm run build # Production build
+npm run typecheck # Type checking
+npm run dev       # Local development server
+npm run build     # Production build
 ```
 
 ## Credits

@@ -15,8 +15,9 @@
   },
   "homepage": "https://wavedash.com/games/fix-it",
   "scripts": {
+    "typecheck": "tsc",
     "dev": "vite --config vite/config.dev.mjs",
-    "build": "vite build --config vite/config.prod.mjs",
+    "build": "tsc && vite build --config vite/config.prod.mjs",
     "preview": "vite preview"
   },
   "devDependencies": {
