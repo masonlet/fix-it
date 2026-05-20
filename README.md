@@ -37,9 +37,14 @@ npm install
 
 ```bash
 npm run typecheck # Type checking
-npm run dev       # Local development server
-npm run build     # Production build
+npm run dev       # Local development http://localhost:5173
+npm run build     # Vite build
+npm run preview   # Preview production Vite build http://localhost:4173
 ```
+
+### 3. Deployment
+
+The production builds static files to the `dist/` directory which can be hosted on any static hosting provider. Node.js is **not required** to run the deployed site.
 
 ## Credits
 
