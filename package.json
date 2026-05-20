@@ -16,14 +16,13 @@
   "homepage": "https://wavedash.com/games/fix-it",
   "scripts": {
     "typecheck": "tsc",
-    "dev": "vite --config vite/config.dev.mjs",
-    "build": "tsc && vite build --config vite/config.prod.mjs",
+    "dev": "vite",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@wvdsh/sdk-js": "^1.2.4",
     "phaser": "^3.86.0",
-    "terser": "^5.34.1",
     "typescript": "^6.0.3",
     "vite": "^5.4.8"
   }
