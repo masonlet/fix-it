@@ -10,9 +10,13 @@ A casual HTML5 arcade game where broken contraptions roll down a conveyor belt. 
 
 ## Tech Stack
 
-- [Phaser](https://github.com/phaserjs/phaser)
-- [YouTube Playables SDK](https://developers.google.com/youtube/gaming/playables/reference/sdk)
-- [Vite](https://github.com/vitejs/vite)
+<p align="left">
+  <img height="35" src="https://img.shields.io/badge/TypeScript-%23007ACC?logo=typescript&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/Vite-%2300C0FF?logo=vite&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/Phaser-%23fb6e00?logo=phaser&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/Wavedash%20SDK-%23000000?logo=wavedash&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/YouTube%20Playables%20SDK-%23FF0000?logo=youtube&logoColor=white&style=for-the-badge"/>
+</p>
 
 ## Deployment & Configuration
 
