@@ -22,7 +22,8 @@ A casual HTML5 arcade game where broken contraptions roll down a conveyor belt. 
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`.
+- npm
+- Node.js 18+ (for local development and building only)
 
 ### 1. Clone & Install
 
