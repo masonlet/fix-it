@@ -6,19 +6,24 @@
 
 A casual HTML5 arcade game where broken contraptions roll down a conveyor belt. Spot the faults, tap to inspect, and complete quick minigames to fix them before they slide off the edge. Start simple - pump a bike tire, screw a lightbulb - then face increasingly complex machines with multiple faults as the belt speeds up. You get 10 lives; each unfixed issue costs one.
 
-> Originally built for the [Gamedev.js Jam 2026](https://gamedevjs.com/jam/2026/) (theme: Machines) as my first game. The jam version lives at [fix-it-jam](https://github.com/masonlet/fix-it-jam); this repo is the continued development.
+> Originally built for the [Gamedev.js Jam 2026](https://gamedevjs.com/jam/2026/) (theme: Machines). The jam version lives at [fix-it-jam](https://github.com/masonlet/fix-it-jam); this repo is the continued development.
 
 ## Tech Stack
 
-- [Phaser](https://github.com/phaserjs/phaser)
-- [YouTube Playables SDK](https://developers.google.com/youtube/gaming/playables/reference/sdk)
-- [Vite](https://github.com/vitejs/vite)
+<p align="left">
+  <img height="35" src="https://img.shields.io/badge/TypeScript-%23007ACC?logo=typescript&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/Vite-%2300C0FF?logo=vite&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/Phaser-%23fb6e00?logo=phaser&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/Wavedash%20SDK-%23000000?logo=wavedash&logoColor=white&style=for-the-badge"/>
+  <img height="35" src="https://img.shields.io/badge/YouTube%20Playables%20SDK-%23FF0000?logo=youtube&logoColor=white&style=for-the-badge"/>
+</p>
 
 ## Deployment & Configuration
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org) is required to install dependencies and run scripts via `npm`.
+- npm
+- Node.js 18+ (for local development and building only)
 
 ### 1. Clone & Install
 
@@ -31,9 +36,15 @@ npm install
 ### 2. Run Locally
 
 ```bash
-npm run dev   # Local development server
-npm run build # Production build
+npm run typecheck # Type checking
+npm run dev       # Local development http://localhost:5173
+npm run build     # Vite build
+npm run preview   # Preview production Vite build http://localhost:4173
 ```
+
+### 3. Deployment
+
+The production builds static files to the `dist/` directory which can be hosted on any static hosting provider. Node.js is **not required** to run the deployed site.
 
 ## Credits
 
