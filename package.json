@@ -1,7 +1,7 @@
 {
   "name": "fix-it",
   "description": "A casual HTML5 arcade game where you spot and fix faulty machines on a conveyor belt before they slide off.",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "type": "module",
   "repository": {
     "type": "git",
