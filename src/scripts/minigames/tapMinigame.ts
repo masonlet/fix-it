@@ -1,28 +1,39 @@
-import { DEPTH } from "../config/Depth";
-import { INDICATOR } from "../config/Indicator";
+import { DEPTH } from "../config/depth.ts";
+import { INDICATOR } from "../config/indicator.ts";
+import type { MinigameScene } from "../game/types.ts";
 
 const LAYOUT = {
   NARROW_WIDTH: 650,
-  BOX_COUNT: 3,
-  BOX_SIZE_PCT: 0.085,
-  BOX_SIZE_PCT_NARROW: 0.15,
+  BOX_COUNT:       3,
+  BOX_SIZE_PCT:    0.085,
   BOX_SPACING_PCT: 0.10,
+  BG_SIZE_PCT:     0.40,
+  BOX_SIZE_PCT_NARROW:    0.15,
   BOX_SPACING_PCT_NARROW: 0.18,
-  BG_SIZE_PCT: 0.4,
-  BG_SIZE_PCT_NARROW: 0.7,
-  BUTTON_Y_OFFSET_PCT: 0.15,
+  BG_SIZE_PCT_NARROW:     0.70,
+  BUTTON_Y_OFFSET_PCT:    0.15,
+}
+
+interface InteractiveBox {
+  insert: Phaser.GameObjects.Image & { fixed?: boolean };
+  border: Phaser.GameObjects.Image;
 }
 
 export class TapMinigame {
-  static useDefaultPopup = false;
+  private scene: MinigameScene;
+  private onComplete: () => void;
+  private remaining: number;
 
-  constructor (scene, cx, cy, onComplete) {
+  private bg: Phaser.GameObjects.Image;
+  private boxes: InteractiveBox[];
+
+  constructor(scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
     this.scene = scene;
     this.onComplete = onComplete;
     this.remaining = LAYOUT.BOX_COUNT;
 
     const width = scene.scale.width;
-    const { bgSize, boxSize, spacing } = this.#computeSizes(width);
+    const { bgSize, boxSize, spacing } = this.computeSizes(width);
     const totalWidth = spacing * (LAYOUT.BOX_COUNT - 1);
     const startX = cx - totalWidth / 2;
     const buttonY = cy + bgSize * LAYOUT.BUTTON_Y_OFFSET_PCT;
@@ -43,12 +54,12 @@ export class TapMinigame {
         .setDisplaySize(boxSize, boxSize)
         .setDepth(DEPTH.MINIGAME);
 
-      insert.on("pointerdown", () => this.#hit(insert));
+      insert.on("pointerdown", () => this.hit(insert));
       this.boxes.push({ insert, border });
     }
   }
 
-  #hit (insert) {
+ private hit(insert: Phaser.GameObjects.Image & { fixed?: boolean }): void {
     if (insert.fixed) return;
     insert.fixed = true;
     insert.setTint(INDICATOR.COLOUR.FIXED);
@@ -60,7 +71,7 @@ export class TapMinigame {
     }
   }
 
-  destroy () {
+  public destroy(): void {
     this.bg.destroy();
     this.boxes.forEach(b => {
       b.insert.destroy();
@@ -68,10 +79,10 @@ export class TapMinigame {
     });
   }
 
-  onResize (width, height) {
+  public onResize(width: number, height: number): void {
     const cx = width / 2;
     const cy = height / 2;
-    const { bgSize, boxSize, spacing } = this.#computeSizes(width);
+    const { bgSize, boxSize, spacing } = this.computeSizes(width);
     const totalWidth = spacing * (LAYOUT.BOX_COUNT - 1);
     const startX = cx - totalWidth / 2;
     const buttonY = cy + bgSize * LAYOUT.BUTTON_Y_OFFSET_PCT;
@@ -84,7 +95,7 @@ export class TapMinigame {
     });
   }
 
-  #computeSizes (width) {
+  private computeSizes(width: number) {
     const narrow = width < LAYOUT.NARROW_WIDTH;
     return {
       bgSize: width * (narrow ? LAYOUT.BG_SIZE_PCT_NARROW : LAYOUT.BG_SIZE_PCT),

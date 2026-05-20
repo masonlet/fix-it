@@ -1,14 +1,35 @@
-import { DEPTH } from "./config/Depth";
-import { BELT } from "./config/Belt";
-import { ITEM } from "./config/Item";
-import { GAME } from "./config/Game";
-import { INDICATOR } from "./config/Indicator";
-import { ITEM_SPRITES } from "./config/ItemSprites";
-import { MINIGAME_TYPES } from "./config/MinigameTypes";
+import { Scene           } from "phaser";
+import { DEPTH           } from "../config/depth.ts";
+import { BELT            } from "../config/belt.ts";
+import { ITEM            } from "../config/item.ts";
+import { GAME            } from "../config/game.ts";
+import { INDICATOR       } from "../config/indicator.ts";
+import { ITEM_SPRITES    } from "../config/itemSprites.ts";
+import { MINIGAME_TYPES  } from "../config/minigameTypes.ts";
+import type { ActiveItem } from "./types.ts";
+
 const TYPES = Object.values(MINIGAME_TYPES);
 
+interface SpawnedItem extends ActiveItem {
+  sprite: Phaser.GameObjects.Container;
+  bg:     Phaser.GameObjects.Image;
+  indicators: Array<{ insert: Phaser.GameObjects.Image; border: Phaser.GameObjects.Image }>;
+}
+
+interface MovementResult {
+  missed: boolean;
+  faults: number;
+}
+
 export class ItemSpawner {
-  constructor (scene) {
+  private scene: Scene;
+  public  items: SpawnedItem[];
+  public  spawnTimer:    number;
+  public  spawnInterval: number;
+  private width:  number;
+  private height: number;
+
+  constructor (scene: Scene) {
     this.scene = scene;
     this.items = [];
     this.spawnTimer = 0;
@@ -17,7 +38,7 @@ export class ItemSpawner {
     this.height = scene.scale.height;
   }
 
-  update (delta, elapsedTime) {
+  update (delta: number, elapsedTime: number): void {
     this.spawnTimer += delta / 1000;
     if (this.spawnTimer >= this.spawnInterval) {
       this.spawnTimer = 0;
@@ -25,9 +46,9 @@ export class ItemSpawner {
     }
   }
 
-  spawn  (elapsedTime) {
+  spawn  (elapsedTime: number): void {
     const beltTop = this.height - (this.height * BELT.LAYOUT.HEIGHT_PCT);
-    const itemSize = this.#computeItemSize(this.width);
+    const itemSize = this.computeItemSize(this.width);
 
     let maxFaults = 1;
     if      (elapsedTime > GAME.TUNING.FAULTS_TIER_3_AT) maxFaults = 3;
@@ -43,21 +64,19 @@ export class ItemSpawner {
 
     const faultTypes = Array.from(
       { length: faults },
-      () => Phaser.Math.RND.pick(TYPES)
+      () => Phaser.Math.RND.pick(TYPES) as string
     );
+    if (!faultTypes[0]) return;
 
-    const spriteKey = faults === 1 ? ITEM_SPRITES[faultTypes[0]] : null;
-    let bg;
-    if (spriteKey) {
-      bg = this.scene.add.image(0, 0, spriteKey)
-        .setDisplaySize(itemSize, itemSize);
-    } else {
-      bg = this.scene.add.image(0, 0, "item-background")
-        .setDisplaySize(itemSize, itemSize);
-    }
+    const spriteKey = faults === 1 ? (ITEM_SPRITES as Record<string, string>)[faultTypes[0]] : null;
+    let bg: Phaser.GameObjects.Image;
+    if (spriteKey) bg = this.scene.add.image(0, 0, spriteKey)
+                          .setDisplaySize(itemSize, itemSize);
+    else bg = this.scene.add.image(0, 0, "item-background")
+                .setDisplaySize(itemSize, itemSize);
     container.add(bg);
 
-    const indicators = [];
+    const indicators: { insert: Phaser.GameObjects.Image; border: Phaser.GameObjects.Image }[] = [];
     if (!spriteKey){
       for (let i = 0; i < faults; i++) {
         const y = itemSize * INDICATOR.LAYOUT.Y_START_PCT + (i * itemSize * INDICATOR.LAYOUT.SPACING_PCT);
@@ -76,18 +95,18 @@ export class ItemSpawner {
       }
     }
 
-    container.setSize(itemSize);
+    container.setSize(itemSize, itemSize);
 
     this.items.push({ sprite: container, bg, faults, totalFaults, indicators, faultTypes });
   }
 
-  moveItems (beltSpeed, delta) {
+  moveItems (beltSpeed: number, delta: number): MovementResult | null {
     const { width } = this.scene.scale;
 
     let missedFaults = 0;
     for (let i = this.items.length - 1; i >= 0; i--) {
       const item = this.items[i];
-      if (item.paused) continue;
+      if (!item || item.paused) continue;
       item.sprite.x -= beltSpeed * width * BELT.TUNING.BASE_SCREENS_PER_SEC * (delta / 1000);
       if (item.sprite.x < width * ITEM.LAYOUT.DESPAWN_X_PCT) {
         missedFaults += item.faults;
@@ -98,12 +117,13 @@ export class ItemSpawner {
     return missedFaults > 0 ? { missed: true, faults: missedFaults } : null;
   }
 
-  removeItem (item) {
-    item.sprite.destroy();
-    this.items.splice(this.items.indexOf(item), 1);
+  public removeItem(item: ActiveItem): void {
+    const spawned = item as SpawnedItem;
+    spawned.sprite.destroy();
+    this.items.splice(this.items.indexOf(spawned), 1);
   }
 
-  getItemAt (x, y) {
+  public getItemAt (x: number, y: number): SpawnedItem | null {
     for (const item of this.items) 
       if (item.sprite.getBounds().contains(x, y))
         return item;
@@ -111,8 +131,8 @@ export class ItemSpawner {
     return null;
   }
 
-  handleResize (width, height) {
-    const itemSize = this.#computeItemSize(width);
+  public handleResize (width: number, height: number): void {
+    const itemSize = this.computeItemSize(width);
     const beltTop = height - height * BELT.LAYOUT.HEIGHT_PCT;
     const y = beltTop - itemSize / 2;
     const oldWidth = this.width ?? width;
@@ -136,7 +156,7 @@ export class ItemSpawner {
     this.height = height;
   }
 
-  #computeItemSize (width) {
+  private computeItemSize (width: number): number {
     const narrow = width < ITEM.LAYOUT.NARROW_WIDTH;
     return width * (narrow ? ITEM.LAYOUT.SIZE_PCT_NARROW : ITEM.LAYOUT.SIZE_PCT);
   }

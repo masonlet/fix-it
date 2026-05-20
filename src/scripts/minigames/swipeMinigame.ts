@@ -1,36 +1,63 @@
-import { DEPTH } from "../config/Depth";
+import { DEPTH } from "../config/depth.ts";
+import type { MinigameScene } from "../game/types.ts";
 
 const LAYOUT = {
   NARROW_WIDTH: 650,
-  LAMP_WIDTH_PCT: 0.4,
-  LAMP_WIDTH_PCT_NARROW: 0.7,
-  LAMP_HEIGHT_PCT: 0.6,
+  ARROW_SIZE_PCT:  0.05,
+  SOCKET_Y_PCT:    0.45,
+  NEW_BULB_Y_PCT:  0.85,
+  LAMP_WIDTH_PCT:  0.40,
+  LAMP_HEIGHT_PCT: 0.60,
+  BULB_SIZE_PCT:   0.24,
+  LAMP_WIDTH_PCT_NARROW:  0.7,
   LAMP_HEIGHT_PCT_NARROW: 0.4,
-  BULB_SIZE_PCT: 0.24,
-  BULB_SIZE_PCT_NARROW: 0.5,
-  ARROW_SIZE_PCT: 0.05,
-  SOCKET_Y_PCT: 0.45,
-  NEW_BULB_Y_PCT: 0.85,
+  BULB_SIZE_PCT_NARROW:   0.5,
 }
 
 const TUNING = {
-  SWIPE_THRESHOLD_PCT: 0.15,
-  ANIM_DURATION_MS: 300,
+  SWIPE_THRESHOLD_PCT:  0.15,
+  ANIM_DURATION_MS:     300,
   BOUNCE_AMPLITUDE_PCT: 0.015,
-  BOUNCE_PERIOD_MS: 1000,
+  BOUNCE_PERIOD_MS:     1000,
 }
 
 const COLOUR = {
-  BROKEN_TINT: 0x444444,
-  FIXED_TINT: 0xffdd66,
+  BROKEN_TINT:  0x444444,
+  FIXED_TINT:   0xffdd66,
   ARROW_BROKEN: 0xaa2222,
-  ARROW_FIXED: 0x007733,
+  ARROW_FIXED:  0x007733,
 }
 
 export class SwipeMinigame {
-  static useDefaultPopup = false;
+  private scene:      MinigameScene;
+  private onComplete: () => void;
+  private cx:    number;
+  private cy:    number;
+  private stage: number;
+  private lastY: number | null;
+  private pointerDown:   boolean;
+  private pieceOffset:   number;
+  private arrowsVisible: boolean;
 
-  constructor (scene, cx, cy, onComplete) {
+  private bulbSize:  number;
+  private arrowSize: number;
+  private threshold: number;
+  private socketY:   number;
+  private newBulbY:  number;
+
+  private lamp:        Phaser.GameObjects.Image;
+  private bulbInsert!: Phaser.GameObjects.Image      | null;
+  private bulbBorder!: Phaser.GameObjects.Image     | null;
+  private arrows!:     Phaser.GameObjects.Container | null;
+
+  private arrowBounceTween: Phaser.Tweens.Tween | null = null;
+  private advanceTween:     Phaser.Tweens.Tween | null = null;
+
+  private onPointerDown: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerMove: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerUp:   () => void;
+
+  constructor(scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
     this.scene = scene;
     this.onComplete = onComplete;
     this.cx = cx;
@@ -42,7 +69,7 @@ export class SwipeMinigame {
     this.arrowsVisible = true;
 
     const { width, height } = scene.scale;
-    const { lampWidth, lampHeight, bulbSize } = this.#computeSizes(width, height);
+    const { lampWidth, lampHeight, bulbSize } = this.computeSizes(width, height);
 
     this.bulbSize = bulbSize;
     this.arrowSize = width * LAYOUT.ARROW_SIZE_PCT;
@@ -54,13 +81,13 @@ export class SwipeMinigame {
       .setDisplaySize(lampWidth, lampHeight)
       .setDepth(DEPTH.MINIGAME);
 
-    this.#spawnBroken();
+    this.spawnBroken();
 
     this.onPointerDown = (p) => {
       this.pointerDown = true;
       this.lastY = p.y;
     };
-    this.onPointerMove = (p) => this.#handleMove(p);
+    this.onPointerMove = (p) => this.handleMove(p);
     this.onPointerUp = () => {
       this.pointerDown = false;
       this.lastY = null;
@@ -68,10 +95,10 @@ export class SwipeMinigame {
 
     scene.input.on("pointerdown", this.onPointerDown);
     scene.input.on("pointermove", this.onPointerMove);
-    scene.input.on("pointerup", this.onPointerUp);
+    scene.input.on("pointerup",   this.onPointerUp);
   }
 
-  #spawnBroken () {
+  private spawnBroken(): void {
     this.bulbInsert = this.scene.add.image(this.cx, this.socketY, "swipe-bulb-insert")
       .setDisplaySize(this.bulbSize, this.bulbSize)
       .setTint(COLOUR.BROKEN_TINT)
@@ -80,11 +107,11 @@ export class SwipeMinigame {
       .setDisplaySize(this.bulbSize, this.bulbSize)
       .setDepth(DEPTH.MINIGAME);
 
-    this.arrows = this.#drawArrows(this.cx, this.socketY + this.bulbSize / 2 + this.arrowSize, 1, COLOUR.ARROW_BROKEN);
-    this.arrowBounceTween = this.#startBounce(this.arrows, 1);
+    this.arrows = this.drawArrows(this.cx, this.socketY + this.bulbSize / 2 + this.arrowSize, 1, COLOUR.ARROW_BROKEN);
+    this.arrowBounceTween = this.startBounce(this.arrows, 1);
   }
 
-  #spawnFixed () {
+  private spawnFixed(): void {
     this.bulbInsert = this.scene.add.image(this.cx, this.newBulbY, "swipe-bulb-insert")
       .setDisplaySize(this.bulbSize, this.bulbSize)
       .setTint(COLOUR.FIXED_TINT)
@@ -96,11 +123,11 @@ export class SwipeMinigame {
     this.pieceOffset = 0;
     this.arrowsVisible = true;
 
-    this.arrows = this.#drawArrows(this.cx, this.newBulbY - this.bulbSize / 2, -1, COLOUR.ARROW_FIXED);
-    this.arrowBounceTween = this.#startBounce(this.arrows, -1);
+    this.arrows = this.drawArrows(this.cx, this.newBulbY - this.bulbSize / 2, -1, COLOUR.ARROW_FIXED);
+    this.arrowBounceTween = this.startBounce(this.arrows, -1);
   }
 
-  #drawArrows (x, y, direction, color) {
+  private drawArrows(x: number, y: number, direction: number, color: number): Phaser.GameObjects.Container {
     const group = this.scene.add.container(x, y).setDepth(DEPTH.MINIGAME);
     const spacing = this.arrowSize * 0.8;
     for (let i = 0; i < 3; i++) {
@@ -116,7 +143,7 @@ export class SwipeMinigame {
     return group;
   }
 
-  #startBounce (arrows, direction) {
+  private startBounce(arrows: Phaser.GameObjects.Container, direction: number): Phaser.Tweens.Tween {
     const amplitude = this.scene.scale.height * TUNING.BOUNCE_AMPLITUDE_PCT;
     return this.scene.tweens.add({
       targets: arrows,
@@ -128,30 +155,30 @@ export class SwipeMinigame {
     });
   }
 
-  #hideArrows () {
+  private hideArrows(): void {
     if (!this.arrowsVisible) return;
     this.arrowsVisible = false;
     this.arrowBounceTween?.stop();
     this.arrows?.destroy();
   }
 
-  #handleMove (pointer) {
+  private handleMove(pointer: Phaser.Input.Pointer): void {
     if (!this.pointerDown) return;
     if (this.lastY !== null) {
       const delta = pointer.y - this.lastY;
       const valid = this.stage === 1 ? delta > 0 : delta < 0;
       if (valid) {
         this.pieceOffset += Math.abs(delta);
-        this.bulbInsert.y += delta;
-        this.bulbBorder.y += delta;
-        if (this.arrowsVisible) this.#hideArrows();
-        if (this.pieceOffset >= this.threshold) this.#advance();
+        if (this.bulbInsert) this.bulbInsert.y += delta;
+        if (this.bulbBorder) this.bulbBorder.y += delta;
+        if (this.arrowsVisible) this.hideArrows();
+        if (this.pieceOffset >= this.threshold) this.advance();
       }
     }
     this.lastY = pointer.y;
   }
 
-  #advance () {
+  private advance(): void {
     this.scene.audio.play("swipe-move");
     this.pointerDown = false;
     this.lastY = null;
@@ -162,12 +189,12 @@ export class SwipeMinigame {
         y: targetY,
         duration: TUNING.ANIM_DURATION_MS,
         onComplete: () => {
-          this.bulbInsert.destroy();
-          this.bulbBorder.destroy();
+          if (this.bulbInsert) this.bulbInsert.destroy();
+          if (this.bulbBorder) this.bulbBorder.destroy();
           this.bulbInsert = null;
           this.bulbBorder = null;
           this.stage = 2;
-          this.#spawnFixed();
+          this.spawnFixed();
         },
       });
     } else {
@@ -183,10 +210,10 @@ export class SwipeMinigame {
     }
   }
 
-  destroy () {
+  public destroy(): void {
     this.scene.input.off("pointerdown", this.onPointerDown);
     this.scene.input.off("pointermove", this.onPointerMove);
-    this.scene.input.off("pointerup", this.onPointerUp);
+    this.scene.input.off("pointerup",   this.onPointerUp);
     this.arrowBounceTween?.stop();
     this.advanceTween?.stop();
     this.lamp?.destroy();
@@ -195,7 +222,7 @@ export class SwipeMinigame {
     this.arrows?.destroy();
   }
 
-  onResize (width, height) {
+  public onResize(width: number, height: number): void {
     this.cx = width / 2;
     this.cy = height / 2;
 
@@ -203,14 +230,14 @@ export class SwipeMinigame {
     this.socketY = height * LAYOUT.SOCKET_Y_PCT;
     this.newBulbY = height * LAYOUT.NEW_BULB_Y_PCT;
     
-    const {lampWidth, lampHeight, bulbSize } = this.#computeSizes(width, height);
+    const {lampWidth, lampHeight, bulbSize } = this.computeSizes(width, height);
     this.bulbSize = bulbSize;
     this.lamp.setPosition(this.cx, this.cy).setDisplaySize(lampWidth, lampHeight);
     this.bulbInsert?.setDisplaySize(bulbSize, bulbSize);
     this.bulbBorder?.setDisplaySize(bulbSize, bulbSize);
   }
 
-  #computeSizes (width, height) {
+  private computeSizes(width: number, height: number) {
     const narrow = width < LAYOUT.NARROW_WIDTH;
     return {
       lampWidth: width * (narrow ? LAYOUT.LAMP_WIDTH_PCT_NARROW : LAYOUT.LAMP_WIDTH_PCT),

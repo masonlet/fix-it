@@ -1,5 +1,4 @@
-import { MINIGAME_TYPES } from "./MinigameTypes";
-
+import { MINIGAME_TYPES } from "./minigameTypes.ts";
 export const ITEM_SPRITES = {
   [MINIGAME_TYPES.DRAG]: "item-toaster",
   [MINIGAME_TYPES.TAP]: "item-walkie",

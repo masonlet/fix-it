@@ -1,10 +1,10 @@
-import { Boot } from './scenes/Boot';
-import { Preloader } from './scenes/Preloader';
-import { MainMenu } from './scenes/MainMenu';
-import { Game } from './scenes/Game';
-import { GameOver } from './scenes/GameOver';
-import { YouTubePlayables } from './YouTubePlayables';
-import { WaveDash } from './WaveDash';
+import { YouTubePlayables } from './scripts/sdk/youTubePlayables.ts';
+import { WaveDash         } from './scripts/sdk/waveDash.ts';
+import { Boot      } from './scripts/scenes/boot.ts';
+import { Preloader } from './scripts/scenes/preloader.ts';
+import { MainMenu  } from './scripts/scenes/mainMenu.ts';
+import { Game      } from './scripts/scenes/game.ts';
+import { GameOver  } from './scripts/scenes/gameOver.ts';
 
 const config = {
   type: Phaser.AUTO,
@@ -28,7 +28,7 @@ YouTubePlayables.boot(async () => {
   const game = new Phaser.Game(config);
   await WaveDash.boot();
 
-  const applyAudioState = (enabled) => { game.sound.mute = !enabled; }
+  const applyAudioState = (enabled: boolean) => { game.sound.mute = !enabled; }
   applyAudioState(YouTubePlayables.isAudioEnabled());
   YouTubePlayables.setAudioChangeCallback(applyAudioState);
 
