@@ -2,6 +2,14 @@ import type { GameAssets            } from "./assets.ts";
 import type { FrameState, GameState } from "./types.ts";
 import { handleMainMenuFrame, renderMainMenuFrame } from "../ui/mainMenu.ts";
 import { handleGameOverFrame, renderGameOverFrame } from "../ui/gameOver.ts";
+import { updatePlayState, renderPlayState } from "./play.ts";
+
+function handlePlayingFrame(frame: FrameState, gameState: GameState, dt: number): FrameState {
+  const over = updatePlayState(gameState, dt);
+  if (over) return { game: "game-over", ui: null };
+  return frame;
+}
+
 
 export function updateFrame(
   canvas:    HTMLCanvasElement,
@@ -12,7 +20,7 @@ export function updateFrame(
   const { width: w, height: h } = canvas;
   switch (frame.game) {
     case "menu-main":  return handleMainMenuFrame(dt, frame.ui);
-    case "playing":    return frame;
+    case "playing":    return handlePlayingFrame(frame, gameState, dt);
     case "game-over":  return handleGameOverFrame(w, h, gameState, frame.ui);
   }
 }
@@ -30,7 +38,7 @@ export function renderFrame(
 
   switch (frame.game) {
     case "menu-main":  renderMainMenuFrame(ctx, w, h, gameState, frame.ui); break;
-    case "playing":    break;
+    case "playing":    renderPlayState(ctx, gameState, assets, w, h); break;
     case "game-over":  renderGameOverFrame(ctx, w, h, gameState, frame.ui); break;
   }
 }
