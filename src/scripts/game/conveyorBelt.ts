@@ -1,30 +1,31 @@
-//import { Scene } from "phaser";
-
-import { DEPTH } from "../config/depth.ts";
 import { BELT } from "../config/belt.ts";
 
-export class ConveyorBelt {
-  private scene:  /*Scene*/;
-  private sprite: /*Phaser.GameObjects.TileSprite*/;
+export interface BeltState {
+  offsetX: number;
+}
 
-  constructor (/*scene: Scene*/) {
-    this.scene = scene;
-    const { width, height } = scene.scale;
-    const beltHeight = height * BELT.LAYOUT.HEIGHT_PCT;
-    this.sprite = scene.add.tileSprite(
-      width / 2, height - beltHeight / 2,
-      width, beltHeight,
-      "belt-tile"
-    ).setDepth(DEPTH.BELT);
-  }
+export function updateBelt(belt: BeltState, beltSpeed: number, w: number, dt: number): void {
+  belt.offsetX += beltSpeed * w * BELT.TUNING.BASE_SCREENS_PER_SEC * dt;
+}
 
-  update (beltSpeed: number, delta: number): void {
-    this.sprite.tilePositionX += beltSpeed * this.scene.scale.width * BELT.TUNING.BASE_SCREENS_PER_SEC * (delta / 1000);
-  }
+export function renderBelt(
+  ctx:   CanvasRenderingContext2D,
+  belt:  BeltState,
+  img:   HTMLImageElement,
+  w:     number,
+  h:     number,
+): void {
+  const beltH = h * BELT.LAYOUT.HEIGHT_PCT;
+  const beltY = h - beltH;
+  const tileW = img.width;
+  const startX = -(belt.offsetX % tileW);
 
-  handleResize (width: number, height: number): void {
-    const beltHeight = height * BELT.LAYOUT.HEIGHT_PCT;
-    this.sprite.setPosition(width / 2, height - beltHeight / 2);
-    this.sprite.setSize(width, beltHeight);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, beltY, w, beltH);
+  ctx.clip();
+  for (let x = startX; x < w; x += tileW) {
+    ctx.drawImage(img, x, beltY, tileW, beltH);
   }
+  ctx.restore();
 }

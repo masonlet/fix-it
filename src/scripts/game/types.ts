@@ -1,3 +1,5 @@
+import type { BeltState } from "./conveyorBelt.ts";
+
 export interface Indicator {
   faultType: string;
   fixed:     boolean;
@@ -17,7 +19,8 @@ export interface ActiveItem {
 export interface GameState {
   score:         number;
   lives:         number;
-  elapsedTime:  number;
+  elapsedTime:   number;
+  belt:          BeltState;
   beltSpeed:     number;
   spawnTimer:    number;
   spawnInterval: number;

@@ -55,6 +55,7 @@ YouTubePlayables.boot(async () => {
     score:         0,
     lives:         GAME.TUNING.LIVES_START,
     elapsedTime:   0,
+    belt:          { offsetX: 0 },
     beltSpeed:     1,
     spawnTimer:    0,
     spawnInterval: GAME.TUNING.SPAWN_INTERVAL_START,
