@@ -1,6 +1,7 @@
 import type { GameAssets            } from "./assets.ts";
 import type { FrameState, GameState } from "./types.ts";
 import { handleMainMenuFrame, renderMainMenuFrame } from "../ui/mainMenu.ts";
+import { handleGameOverFrame, renderGameOverFrame } from "../ui/gameOver.ts";
 
 export function updateFrame(
   canvas:    HTMLCanvasElement,
@@ -8,10 +9,11 @@ export function updateFrame(
   gameState: GameState,
   dt:        number,
 ): FrameState {
+  const { width: w, height: h } = canvas;
   switch (frame.game) {
     case "menu-main":  return handleMainMenuFrame(dt, frame.ui);
     case "playing":    return frame;
-    case "game-over":  return frame;
+    case "game-over":  return handleGameOverFrame(w, h, gameState, frame.ui);
   }
 }
 
@@ -29,6 +31,6 @@ export function renderFrame(
   switch (frame.game) {
     case "menu-main":  renderMainMenuFrame(ctx, w, h, gameState, frame.ui); break;
     case "playing":    break;
-    case "game-over":  break;
+    case "game-over":  renderGameOverFrame(ctx, w, h, gameState, frame.ui); break;
   }
 }
