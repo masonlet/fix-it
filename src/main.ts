@@ -49,6 +49,7 @@ YouTubePlayables.boot(async () => {
 
   YouTubePlayables.setAudioChangeCallback((enabled) => setMuted(!enabled));
   setMuted(!YouTubePlayables.isAudioEnabled());
+  YouTubePlayables.firstFrameReady();
 
   const gameState: GameState = {
     score:         0,
@@ -62,7 +63,7 @@ YouTubePlayables.boot(async () => {
     minigame:      null,
   };
 
-  let frame: FrameState = { game: "menu-main" };
+  let frame: FrameState = { game: "menu-main", ui: null };
 
   const loop = startLoop(
     (dt) => { frame = updateFrame(canvas, frame, gameState, dt);  },

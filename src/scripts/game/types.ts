@@ -26,6 +26,11 @@ export interface GameState {
   minigame:      null;
 }
 
-export type FrameState = { game: "menu-main"  }
-                       | { game: "playing"    }
-                       | { game: "game-over"  }
+export interface MainMenuState {
+  pulseTime:       number;
+  gameReadyCalled: boolean;
+}
+
+export type FrameState = { game: "menu-main"; ui: MainMenuState | null }
+                       | { game: "playing";   ui: null }
+                       | { game: "game-over"; ui: null}
