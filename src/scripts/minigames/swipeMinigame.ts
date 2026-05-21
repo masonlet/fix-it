@@ -45,16 +45,16 @@ export class SwipeMinigame {
   private socketY:   number;
   private newBulbY:  number;
 
-  private lamp:        Phaser.GameObjects.Image;
-  private bulbInsert!: Phaser.GameObjects.Image      | null;
-  private bulbBorder!: Phaser.GameObjects.Image     | null;
-  private arrows!:     Phaser.GameObjects.Container | null;
+  private lamp:        /*Phaser.GameObjects.Image*/;
+  private bulbInsert!: /*Phaser.GameObjects.Image*/     | null;
+  private bulbBorder!: /*Phaser.GameObjects.Image*/     | null;
+  private arrows!:     /*Phaser.GameObjects.Container*/ | null;
 
-  private arrowBounceTween: Phaser.Tweens.Tween | null = null;
-  private advanceTween:     Phaser.Tweens.Tween | null = null;
+  private arrowBounceTween: /*Phaser.Tweens.Tween*/ | null = null;
+  private advanceTween:     /*Phaser.Tweens.Tween*/ | null = null;
 
-  private onPointerDown: (pointer: Phaser.Input.Pointer) => void;
-  private onPointerMove: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerDown: (pointer: /*Phaser.Input.Pointer*/) => void;
+  private onPointerMove: (pointer: /*Phaser.Input.Pointer*/) => void;
   private onPointerUp:   () => void;
 
   constructor(scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
@@ -127,7 +127,12 @@ export class SwipeMinigame {
     this.arrowBounceTween = this.startBounce(this.arrows, -1);
   }
 
-  private drawArrows(x: number, y: number, direction: number, color: number): Phaser.GameObjects.Container {
+  private drawArrows(
+    x: number,
+    y: number,
+    direction: number,
+    color: number
+  ): /*Phaser.GameObjects.Container*/ {
     const group = this.scene.add.container(x, y).setDepth(DEPTH.MINIGAME);
     const spacing = this.arrowSize * 0.8;
     for (let i = 0; i < 3; i++) {
@@ -143,7 +148,10 @@ export class SwipeMinigame {
     return group;
   }
 
-  private startBounce(arrows: Phaser.GameObjects.Container, direction: number): Phaser.Tweens.Tween {
+  private startBounce(
+    arrows: /*Phaser.GameObjects.Container*/,
+    direction: number
+  ): /*Phaser.Tweens.Tween*/ {
     const amplitude = this.scene.scale.height * TUNING.BOUNCE_AMPLITUDE_PCT;
     return this.scene.tweens.add({
       targets: arrows,
@@ -162,7 +170,7 @@ export class SwipeMinigame {
     this.arrows?.destroy();
   }
 
-  private handleMove(pointer: Phaser.Input.Pointer): void {
+  private handleMove(pointer: /*Phaser.Input.Pointer*/): void {
     if (!this.pointerDown) return;
     if (this.lastY !== null) {
       const delta = pointer.y - this.lastY;

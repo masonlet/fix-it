@@ -6,7 +6,7 @@ import { MainMenu  } from './scripts/scenes/mainMenu.ts';
 import { Game      } from './scripts/scenes/game.ts';
 import { GameOver  } from './scripts/scenes/gameOver.ts';
 
-const config = {
+/*const config = {
   type: Phaser.AUTO,
   parent: 'gameParent',
   backgroundColor: '#1a1a2e',
@@ -22,15 +22,15 @@ const config = {
     GameOver
   ],
   pixelArt: true,
-};
+};*/
 
 YouTubePlayables.boot(async () => {
-  const game = new Phaser.Game(config);
+  //const game = new Phaser.Game(config);
   await WaveDash.boot();
 
-  const applyAudioState = (enabled: boolean) => { game.sound.mute = !enabled; }
+  const applyAudioState = (enabled: boolean) => { /*game.sound.mute = !enabled;*/ }
   applyAudioState(YouTubePlayables.isAudioEnabled());
   YouTubePlayables.setAudioChangeCallback(applyAudioState);
 
-  return game;
+  //return game;
 });

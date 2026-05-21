@@ -1,16 +1,16 @@
-import { Scene } from "phaser";
+//import { Scene } from "phaser";
 
 import { HUD } from "../config/hud.ts";
 
 export class Hud {
-  private scene: Scene;
+  private scene: /*Scene*/;
   private lives: number;
   private width: number;
-  private iconImages: Phaser.GameObjects.Image[];
-  private livesText: Phaser.GameObjects.Text;
-  private scoreText: Phaser.GameObjects.Text;
+  private iconImages: /*Phaser.GameObjects.Image[]*/;
+  private livesText:  /*Phaser.GameObjects.Text*/;
+  private scoreText:  /*Phaser.GameObjects.Text*/;
 
-  constructor (scene: Scene) {
+  constructor (/*scene: Scene*/) {
     this.scene = scene;
     this.lives = 0;
     this.width = scene.scale.width;

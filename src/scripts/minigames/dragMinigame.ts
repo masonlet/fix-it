@@ -21,19 +21,19 @@ export class DragMinigame {
   private slotY:  number;
   private snapTolerance: number;
 
-  private bg:    Phaser.GameObjects.Image;
-  private slot:  Phaser.GameObjects.Image;
-  private piece: Phaser.GameObjects.Image;
+  private bg:    /*Phaser.GameObjects.Image*/;
+  private slot:  /*Phaser.GameObjects.Image*/;
+  private piece: /*Phaser.GameObjects.Image*/;
 
   private onDrag: (
-    pointer:    Phaser.Input.Pointer,
-    gameObject: Phaser.GameObjects.GameObject,
+    pointer:    /*Phaser.Input.Pointer*/,
+    gameObject: /*Phaser.GameObjects.GameObject*/,
     dragX: number,
     dragY: number
   ) => void;
   private onDragEnd: (
-    pointer:    Phaser.Input.Pointer,
-    gameObject: Phaser.GameObjects.GameObject
+    pointer:    /*Phaser.Input.Pointer*/,
+    gameObject: /*Phaser.GameObjects.GameObject*/
   ) => void;
 
   constructor (scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {

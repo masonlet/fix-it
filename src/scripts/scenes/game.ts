@@ -1,8 +1,8 @@
-import { Scene } from "phaser";
+//import { Scene } from "phaser";
 import { GAME  } from "../config/game.ts";
 import { BELT  } from "../config/belt.ts";
 import type { ActiveItem } from "../game/types.ts";
-import { Audio           } from "../game/audio.ts";
+//import { Audio           } from "../game/audio.ts";
 import { Hud             } from "../game/hud.ts";
 import { ConveyorBelt    } from "../game/conveyorBelt.ts";
 import { ItemSpawner     } from "../game/itemSpawner.ts";
@@ -19,7 +19,7 @@ const AUDIO_KEYS: string[] = [
   "swipe-move",   "swipe-complete",
 ];
 
-export class Game extends Scene {
+export class Game /*extends Scene*/ {
   // Gameplay Variables
   private elapsedTime!: number;
   private score!:       number;
@@ -27,7 +27,7 @@ export class Game extends Scene {
   private beltSpeed!:   number;
 
   // Engine Subsystems
-  public  audio!:      Audio;
+  public  audio!:      /*Audio*/;
   private hud!:        Hud;
   private belt!:       ConveyorBelt;
   private spawner!:    ItemSpawner;

@@ -47,9 +47,9 @@ export class TimingMinigame {
   private zones:        TargetZone[];
   private zonesCleared: boolean[];
 
-  private gauge:    Phaser.GameObjects.Image;
-  private graphics: Phaser.GameObjects.Graphics;
-  private needle:   Phaser.GameObjects.Rectangle;
+  private gauge:    /*Phaser.GameObjects.Image*/;
+  private graphics: /*Phaser.GameObjects.Graphics*/;
+  private needle:   /*Phaser.GameObjects.Rectangle*/;
 
   private onPointerDown: () => void;
 

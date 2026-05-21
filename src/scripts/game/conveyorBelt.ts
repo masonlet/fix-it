@@ -1,13 +1,13 @@
-import { Scene } from "phaser";
+//import { Scene } from "phaser";
 
 import { DEPTH } from "../config/depth.ts";
 import { BELT } from "../config/belt.ts";
 
 export class ConveyorBelt {
-  private scene: Scene;
-  private sprite: Phaser.GameObjects.TileSprite;
+  private scene:  /*Scene*/;
+  private sprite: /*Phaser.GameObjects.TileSprite*/;
 
-  constructor (scene: Scene) {
+  constructor (/*scene: Scene*/) {
     this.scene = scene;
     const { width, height } = scene.scale;
     const beltHeight = height * BELT.LAYOUT.HEIGHT_PCT;

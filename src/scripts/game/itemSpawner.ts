@@ -1,4 +1,5 @@
-import { Scene           } from "phaser";
+//import { Scene           } from "phaser";
+
 import { DEPTH           } from "../config/depth.ts";
 import { BELT            } from "../config/belt.ts";
 import { ITEM            } from "../config/item.ts";
@@ -6,14 +7,15 @@ import { GAME            } from "../config/game.ts";
 import { INDICATOR       } from "../config/indicator.ts";
 import { ITEM_SPRITES    } from "../config/itemSprites.ts";
 import { MINIGAME_TYPES  } from "../config/minigameTypes.ts";
+
 import type { ActiveItem } from "./types.ts";
 
 const TYPES = Object.values(MINIGAME_TYPES);
 
 interface SpawnedItem extends ActiveItem {
-  sprite: Phaser.GameObjects.Container;
-  bg:     Phaser.GameObjects.Image;
-  indicators: Array<{ insert: Phaser.GameObjects.Image; border: Phaser.GameObjects.Image }>;
+  sprite: /*Phaser.GameObjects.Container*/;
+  bg:     /*Phaser.GameObjects.Image*/;
+  indicators: Array<{ insert: /*Phaser.GameObjects.Image*/; border: /*Phaser.GameObjects.Image*/ }>;
 }
 
 interface MovementResult {
@@ -22,14 +24,14 @@ interface MovementResult {
 }
 
 export class ItemSpawner {
-  private scene: Scene;
+  //private scene: Scene;
   public  items: SpawnedItem[];
   public  spawnTimer:    number;
   public  spawnInterval: number;
   private width:  number;
   private height: number;
 
-  constructor (scene: Scene) {
+  constructor (/*scene: Scene*/) {
     this.scene = scene;
     this.items = [];
     this.spawnTimer = 0;
@@ -54,7 +56,7 @@ export class ItemSpawner {
     if      (elapsedTime > GAME.TUNING.FAULTS_TIER_3_AT) maxFaults = 3;
     else if (elapsedTime > GAME.TUNING.FAULTS_TIER_2_AT) maxFaults = 2;
 
-    const faults = Phaser.Math.Between(1, maxFaults);
+    const faults = /*Phaser.Math.Between(1, maxFaults)*/;
     const totalFaults = faults;
 
     const container = this.scene.add.container(
@@ -64,19 +66,19 @@ export class ItemSpawner {
 
     const faultTypes = Array.from(
       { length: faults },
-      () => Phaser.Math.RND.pick(TYPES) as string
+      () => /*Phaser.Math.RND.pick(TYPES) as string*/
     );
     if (!faultTypes[0]) return;
 
     const spriteKey = faults === 1 ? (ITEM_SPRITES as Record<string, string>)[faultTypes[0]] : null;
-    let bg: Phaser.GameObjects.Image;
+    let bg: /*Phaser.GameObjects.Image*/;
     if (spriteKey) bg = this.scene.add.image(0, 0, spriteKey)
                           .setDisplaySize(itemSize, itemSize);
     else bg = this.scene.add.image(0, 0, "item-background")
                 .setDisplaySize(itemSize, itemSize);
     container.add(bg);
 
-    const indicators: { insert: Phaser.GameObjects.Image; border: Phaser.GameObjects.Image }[] = [];
+    const indicators: { insert: /*Phaser.GameObjects.Image;*/ border: /*Phaser.GameObjects.Image*/ }[] = [];
     if (!spriteKey){
       for (let i = 0; i < faults; i++) {
         const y = itemSize * INDICATOR.LAYOUT.Y_START_PCT + (i * itemSize * INDICATOR.LAYOUT.SPACING_PCT);

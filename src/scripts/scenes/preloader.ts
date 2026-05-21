@@ -1,4 +1,4 @@
-import { Scene            } from "phaser";
+//import { Scene            } from "phaser";
 import { YouTubePlayables } from "../sdk/youTubePlayables.ts";
 import { WaveDash         } from "../sdk/waveDash.ts";
 
@@ -50,7 +50,7 @@ const IMAGES: Array<[string, string]> = [
   ["timing-gauge",      "minigames/timing/gauge.png"],
 ];
 
-export class Preloader extends Scene {
+export class Preloader /*extends Scene*/ {
   constructor () {
     super("Preloader");
   }

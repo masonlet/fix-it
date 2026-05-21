@@ -15,8 +15,8 @@ const LAYOUT = {
 }
 
 interface InteractiveBox {
-  insert: Phaser.GameObjects.Image & { fixed?: boolean };
-  border: Phaser.GameObjects.Image;
+  insert: /*Phaser.GameObjects.Image*/ & { fixed?: boolean };
+  border: /*Phaser.GameObjects.Image*/;
 }
 
 export class TapMinigame {
@@ -24,7 +24,7 @@ export class TapMinigame {
   private onComplete: () => void;
   private remaining: number;
 
-  private bg: Phaser.GameObjects.Image;
+  private bg: /*Phaser.GameObjects.Image*/;
   private boxes: InteractiveBox[];
 
   constructor(scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
@@ -59,7 +59,7 @@ export class TapMinigame {
     }
   }
 
- private hit(insert: Phaser.GameObjects.Image & { fixed?: boolean }): void {
+ private hit(insert: /*Phaser.GameObjects.Image*/ & { fixed?: boolean }): void {
     if (insert.fixed) return;
     insert.fixed = true;
     insert.setTint(INDICATOR.COLOUR.FIXED);

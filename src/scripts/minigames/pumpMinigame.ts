@@ -28,7 +28,7 @@ export class PumpMinigame {
   private lastHandleY: number | null;
   private pointerDown: boolean;
   private arrowsVisible: boolean;
-  private pumpIdleTimer: Phaser.Time.TimerEvent | null;
+  private pumpIdleTimer: /*Phaser.Time.TimerEvent*/ | null;
 
   private pumpTop!: number;
   private pumpBottom!: number;
@@ -39,17 +39,17 @@ export class PumpMinigame {
   private handleHeight!: number;
   private pumpHeight!: number;
 
-  private pumpBody: Phaser.GameObjects.Image;
-  private arrowUp: Phaser.GameObjects.Triangle | null;
-  private arrowDown: Phaser.GameObjects.Triangle | null;
-  private arrowTween: Phaser.Tweens.Tween | null;
-  private handleInsert: Phaser.GameObjects.Image;
-  private handleBorder: Phaser.GameObjects.Image;
-  private bar: Phaser.GameObjects.Image;
-  private barBorder: Phaser.GameObjects.Image;
+  private pumpBody:     /*Phaser.GameObjects.Image*/;
+  private handleInsert: /*Phaser.GameObjects.Image*/;
+  private handleBorder: /*Phaser.GameObjects.Image*/;
+  private bar:          /*Phaser.GameObjects.Image*/;
+  private barBorder:    /*Phaser.GameObjects.Image*/;
+  private arrowUp:      /*Phaser.GameObjects.Triangle*/ | null;
+  private arrowDown:    /*Phaser.GameObjects.Triangle*/ | null;
+  private arrowTween:   /*Phaser.Tweens.Tween*/         | null;
 
-  private onPointerDown: (pointer: Phaser.Input.Pointer) => void;
-  private onPointerMove: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerDown: (pointer: /*Phaser.Input.Pointer*/) => void;
+  private onPointerMove: (pointer: /*Phaser.Input.Pointer*/) => void;
   private onPointerUp: () => void;
 
   constructor (scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
@@ -154,7 +154,7 @@ export class PumpMinigame {
     scene.input.on("pointerup", this.onPointerUp);
   }
 
-  private handleMove(pointer: Phaser.Input.Pointer): void {
+  private handleMove(pointer: /*Phaser.Input.Pointer*/): void {
     if (!this.pointerDown) return;
 
     const y = pointer.y;

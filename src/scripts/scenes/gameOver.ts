@@ -1,21 +1,21 @@
-import { Scene            } from "phaser";
+//import { Scene            } from "phaser";
 import { YouTubePlayables } from "../sdk/youTubePlayables.ts";
 import { WaveDash         } from "../sdk/waveDash.ts";
-import { Audio } from "../game/audio.ts";
+//import { Audio } from "../game/audio.ts";
 
 interface GameOverData {
   score?: number;
   time?:  number;
 }
 
-export class GameOver extends Scene {
-  private audio!:        Audio;
-  private gameOverText!: Phaser.GameObjects.Text;
-  private scoreText!:    Phaser.GameObjects.Text;
-  private timeText!:     Phaser.GameObjects.Text;
-  private playBtn!:      Phaser.GameObjects.Text;
-  private menuBtn!:      Phaser.GameObjects.Text;
-  private newHighText?:  Phaser.GameObjects.Text;
+export class GameOver  /*extends Scene*/ {
+  private audio!:        /*Audio*/;
+  private gameOverText!: /*Phaser.GameObjects.Text*/;
+  private scoreText!:    /*Phaser.GameObjects.Text*/;
+  private timeText!:     /*Phaser.GameObjects.Text*/;
+  private playBtn!:      /*Phaser.GameObjects.Text*/;
+  private menuBtn!:      /*Phaser.GameObjects.Text*/;
+  private newHighText?:  /*Phaser.GameObjects.Text*/;
 
   constructor () {
     super("GameOver");
@@ -93,7 +93,7 @@ export class GameOver extends Scene {
     this.events.once("shutdown", this.shutdown, this);
   }
 
-  public handleResize(gameSize: Phaser.Structs.Size): void {
+  public handleResize(gameSize: /*Phaser.Structs.Size*/): void {
     const { width, height } = gameSize;
     this.gameOverText.setPosition(width / 2, height * 0.2);
     this.scoreText.setPosition(width / 2, height * 0.35);

@@ -44,10 +44,10 @@ export class MinigameManager {
   private activeItem:      ActiveItem       | null;
   private currentMinigame: MinigameInstance | null;
   
-  private overlay:    Phaser.GameObjects.Rectangle | null;
-  private popup:      Phaser.GameObjects.Rectangle | null;
-  private timerBarBg: Phaser.GameObjects.Rectangle | null;
-  private timerBar:   Phaser.GameObjects.Rectangle | null;
+  private overlay:    /*Phaser.GameObjects.Rectangle*/ | null;
+  private popup:      /*Phaser.GameObjects.Rectangle*/ | null;
+  private timerBarBg: /*Phaser.GameObjects.Rectangle*/ | null;
+  private timerBar:   /*Phaser.GameObjects.Rectangle*/ | null;
 
   constructor(scene: MinigameScene) {
     this.scene           = scene;

@@ -33,19 +33,19 @@ export class SpinMinigame {
   private pointerDown:    boolean;
   private completed:      boolean;
   private lastDrawnPct:   number;
-  private spinIdleTimer:  Phaser.Time.TimerEvent | null;
+  private spinIdleTimer:  /*Phaser.Time.TimerEvent*/ | null;
 
   private ringRadius:    number;
   private ringThickness: number;
 
-  private pipe:      Phaser.GameObjects.Image;
-  private valve:     Phaser.GameObjects.Image;
-  private ring:      Phaser.GameObjects.Graphics;
-  private hint:      Phaser.GameObjects.Graphics | null;
-  private hintTween: Phaser.Tweens.Tween         | null;
+  private pipe:      /*Phaser.GameObjects.Image*/;
+  private valve:     /*Phaser.GameObjects.Image*/;
+  private ring:      /*Phaser.GameObjects.Graphics*/;
+  private hint:      /*Phaser.GameObjects.Graphics*/ | null;
+  private hintTween: /*Phaser.Tweens.Tween*/         | null;
 
-  private onPointerDown: (pointer: Phaser.Input.Pointer) => void;
-  private onPointerMove: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerDown: (pointer: /*Phaser.Input.Pointer*/) => void;
+  private onPointerMove: (pointer: /*Phaser.Input.Pointer*/) => void;
   private onPointerUp:   () => void;
 
   constructor (scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
@@ -106,7 +106,7 @@ export class SpinMinigame {
     scene.input.on("pointerup", this.onPointerUp);
   }
 
-  private handleMove(pointer: Phaser.Input.Pointer): void {
+  private handleMove(pointer: /*Phaser.Input.Pointer*/): void {
     if (!this.pointerDown || this.completed) return;
 
     const angle = Math.atan2(pointer.y - this.cy, pointer.x - this.cx);
@@ -171,7 +171,7 @@ export class SpinMinigame {
     }
   }
 
-  private drawHint(): Phaser.GameObjects.Graphics {
+  private drawHint(): /*Phaser.GameObjects.Graphics*/ {
     const g = this.scene.add.graphics().setDepth(DEPTH.MINIGAME);
     const hintRadius = this.ringRadius * 1.3;
     const startAngle = -Math.PI / 2;

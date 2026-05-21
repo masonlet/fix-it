@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "@wvdsh/sdk-js": "^1.2.4",
-    "phaser": "^3.86.0",
     "typescript": "^6.0.3",
     "vite": "^5.4.8"
   }
