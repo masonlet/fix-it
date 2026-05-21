@@ -1,12 +1,11 @@
 
-import { bootstrapGame } from './scripts/game/game.ts';
 import { registerSound    } from 'web-engine/audio/registry.ts';
 import { setMuted         } from 'web-engine/audio/mixer.ts';
 import { startLoop        } from 'web-engine/update.ts';
-
 import { YouTubePlayables } from './scripts/sdk/youTubePlayables.ts';
 import { WaveDash         } from './scripts/sdk/waveDash.ts';
-
+import { bootstrapGame            } from './scripts/game/game.ts';
+import { loadAssets               } from './scripts/game/assets.ts';
 import { updateFrame, renderFrame } from "./scripts/game/frame.ts";
 import type { FrameState          } from "./scripts/game/types.ts";
 
@@ -14,6 +13,15 @@ const BASE_URL = import.meta.env.BASE_URL;
 
 YouTubePlayables.boot(async () => {
   await WaveDash.boot();
+  let highScore: number | null = null;
+  try {
+    if (WaveDash.isAvailable()) {
+      highScore = await WaveDash.loadHighScore();
+    } else {
+      const data = await YouTubePlayables.loadData() as { highScore?: number } | null;
+      highScore = data?.highScore ?? null;
+    }
+  } catch (e) { console.warn("[main] failed to load high score:", e); }
 
   const { canvas, ctx } = bootstrapGame();
 
@@ -36,13 +44,15 @@ YouTubePlayables.boot(async () => {
     registerSound("timing-complete", "assets/audio/minigames/timing/complete.wav", BASE_URL),
   ]);
 
+  const assets = await loadAssets(BASE_URL);
+
   YouTubePlayables.setAudioChangeCallback((enabled) => setMuted(!enabled));
   setMuted(!YouTubePlayables.isAudioEnabled());
 
-  let frame: FrameState = { game: "preloading" };
+  let frame: FrameState = { game: "menu-main" };
   startLoop(
     (dt) => { frame = updateFrame(canvas, frame, dt);  },
-    (  ) => { renderFrame(ctx, canvas, frame); },
+    (  ) => { renderFrame(ctx, canvas, assets, frame); },
     { tickRate: "variable" },
   );
 });

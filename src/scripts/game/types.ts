@@ -26,7 +26,6 @@ export interface MinigameScene /*extends Scene*/ {
   onFixComplete?(result: { fixed: boolean; complete: boolean; item: any }): void;
 }
 
-export type FrameState = { game: "preloading" }
-                       | { game: "menu-main"  }
+export type FrameState = { game: "menu-main"  }
                        | { game: "playing"    }
                        | { game: "game-over"  }

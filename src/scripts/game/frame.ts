@@ -1,4 +1,5 @@
-import type { FrameState } from "./types";
+import type { GameAssets } from "./assets.ts";
+import type { FrameState } from "./types.ts";
 
 export function updateFrame(
   canvas: HTMLCanvasElement,
@@ -6,7 +7,6 @@ export function updateFrame(
   dt:     number,
 ): FrameState {
   switch (frame.game) {
-    case "preloading": return frame;
     case "menu-main":  return frame;
     case "playing":    return frame;
     case "game-over":  return frame;
@@ -16,10 +16,10 @@ export function updateFrame(
 export function renderFrame(
   ctx:    CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
+  assets: GameAssets,
   frame:  FrameState,
 ): void {
   switch (frame.game) {
-    case "preloading": break;
     case "menu-main":  break;
     case "playing":    break;
     case "game-over":  break;
