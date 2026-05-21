@@ -26,7 +26,13 @@ export interface GameAssets {
     drag:   { background: HTMLImageElement; plug: HTMLImageElement; socket: HTMLImageElement; };
     pump:   { body: HTMLImageElement; };
     spin:   { pipe: HTMLImageElement; valve: HTMLImageElement; };
-    swipe:  { bulbInsert: HTMLImageElement; bulb: HTMLImageElement; light: HTMLImageElement; };
+    swipe:  {
+      bulbInsert:       HTMLImageElement;
+      bulbInsertBroken: HTMLCanvasElement;
+      bulbInsertFixed:  HTMLCanvasElement;
+      bulb:             HTMLImageElement;
+      light:            HTMLImageElement;
+    };
     tap:    { walkieClose: HTMLImageElement; };
     timing: { gauge: HTMLImageElement; };
   };
@@ -89,7 +95,13 @@ export async function loadAssets(baseUrl: string): Promise<GameAssets> {
       drag:   { background: dragBg, plug: dragPlug, socket: dragSocket },
       pump:   { body: pumpBody },
       spin:   { pipe: spinPipe, valve: spinValve },
-      swipe:  { bulbInsert: swipeBulbInsert, bulb: swipeBulb, light: swipeLight },
+      swipe:  {
+        bulbInsert: swipeBulbInsert,
+        bulbInsertBroken: tintImage(swipeBulbInsert, "#444444"),
+        bulbInsertFixed:  tintImage(swipeBulbInsert, "#ffdd66"),
+        bulb: swipeBulb,
+        light: swipeLight
+      },
       tap:    { walkieClose: tapWalkieClose },
       timing: { gauge: timingGauge },
     },

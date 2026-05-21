@@ -1,256 +1,239 @@
-import { DEPTH } from "../config/depth.ts";
-import type { MinigameScene } from "../game/types.ts";
+import { isPointerDown, wasPointerClicked, wasPointerReleased, pointerY } from "web-engine/input/pointer.ts";
+import { playSound } from "web-engine/audio/playback.ts";
+import type { GameAssets } from "../game/assets.ts";
 
 const LAYOUT = {
-  NARROW_WIDTH: 650,
-  ARROW_SIZE_PCT:  0.05,
-  SOCKET_Y_PCT:    0.45,
-  NEW_BULB_Y_PCT:  0.85,
-  LAMP_WIDTH_PCT:  0.40,
-  LAMP_HEIGHT_PCT: 0.60,
-  BULB_SIZE_PCT:   0.24,
-  LAMP_WIDTH_PCT_NARROW:  0.7,
-  LAMP_HEIGHT_PCT_NARROW: 0.4,
-  BULB_SIZE_PCT_NARROW:   0.5,
-}
+  NARROW_WIDTH:           650,
+  ARROW_SIZE_PCT:         0.05,
+  SOCKET_Y_PCT:           0.45,
+  NEW_BULB_Y_PCT:         0.85,
+  LAMP_WIDTH_PCT:         0.40,
+  LAMP_HEIGHT_PCT:        0.60,
+  BULB_SIZE_PCT:          0.24,
+  LAMP_WIDTH_PCT_NARROW:  0.70,
+  LAMP_HEIGHT_PCT_NARROW: 0.40,
+  BULB_SIZE_PCT_NARROW:   0.50,
+};
 
 const TUNING = {
   SWIPE_THRESHOLD_PCT:  0.15,
-  ANIM_DURATION_MS:     300,
+  ANIM_DURATION:        0.3,
   BOUNCE_AMPLITUDE_PCT: 0.015,
-  BOUNCE_PERIOD_MS:     1000,
+  BOUNCE_PERIOD:        1.0,
+};
+
+function computeSizes(w: number, h: number) {
+  const narrow = w < LAYOUT.NARROW_WIDTH;
+  return {
+    lampWidth:  w * (narrow ? LAYOUT.LAMP_WIDTH_PCT_NARROW  : LAYOUT.LAMP_WIDTH_PCT),
+    lampHeight: h * (narrow ? LAYOUT.LAMP_HEIGHT_PCT_NARROW : LAYOUT.LAMP_HEIGHT_PCT),
+    bulbSize:   w * (narrow ? LAYOUT.BULB_SIZE_PCT_NARROW   : LAYOUT.BULB_SIZE_PCT),
+  };
 }
 
-const COLOUR = {
-  BROKEN_TINT:  0x444444,
-  FIXED_TINT:   0xffdd66,
-  ARROW_BROKEN: 0xaa2222,
-  ARROW_FIXED:  0x007733,
+type SwipePhase = "remove" | "removing" | "insert" | "inserting" | "done";
+
+export interface SwipeState {
+  cx:           number;
+  cy:           number;
+  h:            number;
+  lampWidth:    number;
+  lampHeight:   number;
+  bulbSize:     number;
+  arrowSize:    number;
+  threshold:    number;
+  socketY:      number;
+  newBulbY:     number;
+  phase:        SwipePhase;
+  bulbY:        number;
+  animFrom:     number;
+  animTo:       number;
+  animTime:     number;
+  pieceOffset:  number;
+  pointerDown:  boolean;
+  lastY:        number | null;
+  arrowsVisible: boolean;
+  arrowTime:    number;
 }
 
-export class SwipeMinigame {
-  private scene:      MinigameScene;
-  private onComplete: () => void;
-  private cx:    number;
-  private cy:    number;
-  private stage: number;
-  private lastY: number | null;
-  private pointerDown:   boolean;
-  private pieceOffset:   number;
-  private arrowsVisible: boolean;
+export function createSwipeState(w: number, h: number): SwipeState {
+  const { lampWidth, lampHeight, bulbSize } = computeSizes(w, h);
+  const socketY  = h * LAYOUT.SOCKET_Y_PCT;
+  const newBulbY = h * LAYOUT.NEW_BULB_Y_PCT;
+  return {
+    cx: w / 2, cy: h / 2, h,
+    lampWidth, lampHeight, bulbSize,
+    arrowSize:    w * LAYOUT.ARROW_SIZE_PCT,
+    threshold:    h * TUNING.SWIPE_THRESHOLD_PCT,
+    socketY, newBulbY,
+    phase:        "remove",
+    bulbY:        socketY,
+    animFrom:     socketY,
+    animTo:       socketY,
+    animTime:     0,
+    pieceOffset:  0,
+    pointerDown:  false,
+    lastY:        null,
+    arrowsVisible: true,
+    arrowTime:    0,
+  };
+}
 
-  private bulbSize:  number;
-  private arrowSize: number;
-  private threshold: number;
-  private socketY:   number;
-  private newBulbY:  number;
+export function updateSwipe(state: SwipeState, dt: number, onComplete: () => void): SwipeState {
+  if (state.phase === "done") return state;
 
-  private lamp:        /*Phaser.GameObjects.Image*/;
-  private bulbInsert!: /*Phaser.GameObjects.Image*/     | null;
-  private bulbBorder!: /*Phaser.GameObjects.Image*/     | null;
-  private arrows!:     /*Phaser.GameObjects.Container*/ | null;
+  let {
+    phase,
+    bulbY,
+    animFrom,
+    animTo,
+    animTime,
+    pieceOffset,
+    pointerDown,
+    lastY,
+    arrowsVisible,
+    arrowTime
+  } = state;
 
-  private arrowBounceTween: /*Phaser.Tweens.Tween*/ | null = null;
-  private advanceTween:     /*Phaser.Tweens.Tween*/ | null = null;
+  arrowTime += dt;
 
-  private onPointerDown: (pointer: /*Phaser.Input.Pointer*/) => void;
-  private onPointerMove: (pointer: /*Phaser.Input.Pointer*/) => void;
-  private onPointerUp:   () => void;
-
-  constructor(scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
-    this.scene = scene;
-    this.onComplete = onComplete;
-    this.cx = cx;
-    this.cy = cy;
-    this.stage = 1;
-    this.lastY = null;
-    this.pointerDown = false;
-    this.pieceOffset = 0;
-    this.arrowsVisible = true;
-
-    const { width, height } = scene.scale;
-    const { lampWidth, lampHeight, bulbSize } = this.computeSizes(width, height);
-
-    this.bulbSize = bulbSize;
-    this.arrowSize = width * LAYOUT.ARROW_SIZE_PCT;
-    this.threshold = height * TUNING.SWIPE_THRESHOLD_PCT;
-    this.socketY = height * LAYOUT.SOCKET_Y_PCT;
-    this.newBulbY = height * LAYOUT.NEW_BULB_Y_PCT;
-
-    this.lamp = scene.add.image(cx, cy, "swipe-light")
-      .setDisplaySize(lampWidth, lampHeight)
-      .setDepth(DEPTH.MINIGAME);
-
-    this.spawnBroken();
-
-    this.onPointerDown = (p) => {
-      this.pointerDown = true;
-      this.lastY = p.y;
+  if (phase === "removing") {
+    animTime += dt;
+    bulbY = animFrom + (animTo - animFrom) * Math.min(1, animTime / TUNING.ANIM_DURATION);
+    if (animTime >= TUNING.ANIM_DURATION) return {
+      ...state,
+      phase: "insert",
+      bulbY: state.newBulbY,
+      animTime: 0,
+      pieceOffset: 0,
+      arrowsVisible: true,
+      arrowTime: 0
     };
-    this.onPointerMove = (p) => this.handleMove(p);
-    this.onPointerUp = () => {
-      this.pointerDown = false;
-      this.lastY = null;
-    };
-
-    scene.input.on("pointerdown", this.onPointerDown);
-    scene.input.on("pointermove", this.onPointerMove);
-    scene.input.on("pointerup",   this.onPointerUp);
+    return { ...state, bulbY, animTime };
   }
 
-  private spawnBroken(): void {
-    this.bulbInsert = this.scene.add.image(this.cx, this.socketY, "swipe-bulb-insert")
-      .setDisplaySize(this.bulbSize, this.bulbSize)
-      .setTint(COLOUR.BROKEN_TINT)
-      .setDepth(DEPTH.MINIGAME);
-    this.bulbBorder = this.scene.add.image(this.cx, this.socketY, "swipe-bulb")
-      .setDisplaySize(this.bulbSize, this.bulbSize)
-      .setDepth(DEPTH.MINIGAME);
-
-    this.arrows = this.drawArrows(this.cx, this.socketY + this.bulbSize / 2 + this.arrowSize, 1, COLOUR.ARROW_BROKEN);
-    this.arrowBounceTween = this.startBounce(this.arrows, 1);
-  }
-
-  private spawnFixed(): void {
-    this.bulbInsert = this.scene.add.image(this.cx, this.newBulbY, "swipe-bulb-insert")
-      .setDisplaySize(this.bulbSize, this.bulbSize)
-      .setTint(COLOUR.FIXED_TINT)
-      .setDepth(DEPTH.MINIGAME);
-    this.bulbBorder = this.scene.add.image(this.cx, this.newBulbY, "swipe-bulb")
-      .setDisplaySize(this.bulbSize, this.bulbSize)
-      .setDepth(DEPTH.MINIGAME);
-
-    this.pieceOffset = 0;
-    this.arrowsVisible = true;
-
-    this.arrows = this.drawArrows(this.cx, this.newBulbY - this.bulbSize / 2, -1, COLOUR.ARROW_FIXED);
-    this.arrowBounceTween = this.startBounce(this.arrows, -1);
-  }
-
-  private drawArrows(
-    x: number,
-    y: number,
-    direction: number,
-    color: number
-  ): /*Phaser.GameObjects.Container*/ {
-    const group = this.scene.add.container(x, y).setDepth(DEPTH.MINIGAME);
-    const spacing = this.arrowSize * 0.8;
-    for (let i = 0; i < 3; i++) {
-      const tri = this.scene.add.triangle(
-        0, i * spacing * direction,
-        0, 0,
-        this.arrowSize, 0,
-        this.arrowSize / 2, this.arrowSize * direction,
-        color
-      ).setOrigin(0.5, direction > 0 ? 0 : 1);
-      group.add(tri);
+  if (phase === "inserting") {
+    animTime += dt;
+    bulbY = animFrom + (animTo - animFrom) * Math.min(1, animTime / TUNING.ANIM_DURATION);
+    if (animTime >= TUNING.ANIM_DURATION) {
+      playSound("swipe-complete");
+      onComplete();
+      return { ...state, phase: "done", bulbY: state.socketY };
     }
-    return group;
+    return { ...state, bulbY, animTime };
   }
 
-  private startBounce(
-    arrows: /*Phaser.GameObjects.Container*/,
-    direction: number
-  ): /*Phaser.Tweens.Tween*/ {
-    const amplitude = this.scene.scale.height * TUNING.BOUNCE_AMPLITUDE_PCT;
-    return this.scene.tweens.add({
-      targets: arrows,
-      y: arrows.y + amplitude * direction,
-      duration: TUNING.BOUNCE_PERIOD_MS / 2,
-      yoyo: true,
-      repeat: -1,
-      ease: "Sine.easeInOut",
-    });
-  }
+  if (wasPointerClicked()) { pointerDown = true;  lastY = pointerY(); }
+  if (wasPointerReleased()) { pointerDown = false; lastY = null; }
 
-  private hideArrows(): void {
-    if (!this.arrowsVisible) return;
-    this.arrowsVisible = false;
-    this.arrowBounceTween?.stop();
-    this.arrows?.destroy();
-  }
+  if (pointerDown && isPointerDown() && lastY !== null) {
+    const py    = pointerY();
+    const delta = py - lastY;
+    const valid = phase === "remove" ? delta > 0 : delta < 0;
 
-  private handleMove(pointer: /*Phaser.Input.Pointer*/): void {
-    if (!this.pointerDown) return;
-    if (this.lastY !== null) {
-      const delta = pointer.y - this.lastY;
-      const valid = this.stage === 1 ? delta > 0 : delta < 0;
-      if (valid) {
-        this.pieceOffset += Math.abs(delta);
-        if (this.bulbInsert) this.bulbInsert.y += delta;
-        if (this.bulbBorder) this.bulbBorder.y += delta;
-        if (this.arrowsVisible) this.hideArrows();
-        if (this.pieceOffset >= this.threshold) this.advance();
+    if (valid) {
+      pieceOffset += Math.abs(delta);
+      bulbY += delta;
+      if (arrowsVisible) arrowsVisible = false;
+
+      if (pieceOffset >= state.threshold) {
+        playSound("swipe-move");
+        if (phase === "remove") return {
+          ...state,
+          phase: "removing",
+          bulbY,
+          animFrom: bulbY,
+          animTo: state.h + state.bulbSize,
+          animTime: 0,
+          pieceOffset,
+          pointerDown: false,
+          lastY: null,
+          arrowsVisible,
+          arrowTime
+        };
+        else return { 
+          ...state,
+          phase: "inserting",
+          bulbY,
+          animFrom: bulbY,
+          animTo: state.socketY,
+          animTime: 0,
+          pieceOffset,
+          pointerDown: false,
+          lastY: null,
+          arrowsVisible,
+          arrowTime
+        };
       }
     }
-    this.lastY = pointer.y;
+    lastY = py;
   }
 
-  private advance(): void {
-    this.scene.audio.play("swipe-move");
-    this.pointerDown = false;
-    this.lastY = null;
-    if (this.stage === 1) {
-      const targetY = this.scene.scale.height + this.bulbSize;
-      this.advanceTween = this.scene.tweens.add({
-        targets: [this.bulbInsert, this.bulbBorder],
-        y: targetY,
-        duration: TUNING.ANIM_DURATION_MS,
-        onComplete: () => {
-          if (this.bulbInsert) this.bulbInsert.destroy();
-          if (this.bulbBorder) this.bulbBorder.destroy();
-          this.bulbInsert = null;
-          this.bulbBorder = null;
-          this.stage = 2;
-          this.spawnFixed();
-        },
-      });
-    } else {
-      this.advanceTween = this.scene.tweens.add({
-        targets: [this.bulbInsert, this.bulbBorder],
-        y: this.socketY,
-        duration: TUNING.ANIM_DURATION_MS,
-        onComplete: () => {
-          this.scene.audio.play("swipe-complete");
-          this.onComplete();
-        },
-      });
+  return { ...state, bulbY, pieceOffset, pointerDown, lastY, arrowsVisible, arrowTime };
+}
+
+export function resizeSwipe(state: SwipeState, w: number, h: number): SwipeState {
+  const { lampWidth, lampHeight, bulbSize } = computeSizes(w, h);
+  return {
+    ...state,
+    cx: w / 2, cy: h / 2, h,
+    lampWidth, lampHeight, bulbSize,
+    arrowSize: w * LAYOUT.ARROW_SIZE_PCT,
+    threshold: h * TUNING.SWIPE_THRESHOLD_PCT,
+    socketY:   h * LAYOUT.SOCKET_Y_PCT,
+    newBulbY:  h * LAYOUT.NEW_BULB_Y_PCT,
+  };
+}
+
+export function renderSwipe(ctx: CanvasRenderingContext2D, state: SwipeState, assets: GameAssets): void {
+  if (state.phase === "done") return;
+
+  const {
+    cx,
+    cy,
+    lampWidth,
+    lampHeight,
+    bulbSize,
+    arrowSize,
+    bulbY,
+    phase,
+    arrowsVisible,
+    arrowTime,
+    h
+  } = state;
+
+  ctx.drawImage(assets.minigames.swipe.light, cx - lampWidth/2, cy - lampHeight/2, lampWidth, lampHeight);
+
+  const isFixed      = phase === "insert" || phase === "inserting";
+  const insertImg    = isFixed ? assets.minigames.swipe.bulbInsertFixed : assets.minigames.swipe.bulbInsertBroken;
+  ctx.drawImage(insertImg,                    cx - bulbSize/2, bulbY - bulbSize/2, bulbSize, bulbSize);
+  ctx.drawImage(assets.minigames.swipe.bulb,  cx - bulbSize/2, bulbY - bulbSize/2, bulbSize, bulbSize);
+
+  if (arrowsVisible && (phase === "remove" || phase === "insert")) {
+    const direction   = phase === "remove" ? 1 : -1;
+    const arrowColor  = phase === "remove" ? "#aa2222" : "#007733";
+    const bounceAmp   = h * TUNING.BOUNCE_AMPLITUDE_PCT;
+    const bounce      = bounceAmp * Math.sin(arrowTime * Math.PI * 2 / TUNING.BOUNCE_PERIOD) * direction;
+    const spacing     = arrowSize * 0.8;
+    const arrowBaseY  = direction > 0
+      ? bulbY + bulbSize/2 + arrowSize + bounce
+      : bulbY - bulbSize/2 - arrowSize + bounce;
+
+    ctx.fillStyle = arrowColor;
+    for (let i = 0; i < 3; i++) {
+      const oy = i * spacing * direction;
+      ctx.beginPath();
+      if (direction > 0) {
+        ctx.moveTo(cx,              arrowBaseY + oy + arrowSize);
+        ctx.lineTo(cx - arrowSize/2, arrowBaseY + oy);
+        ctx.lineTo(cx + arrowSize/2, arrowBaseY + oy);
+      } else {
+        ctx.moveTo(cx,              arrowBaseY + oy - arrowSize);
+        ctx.lineTo(cx - arrowSize/2, arrowBaseY + oy);
+        ctx.lineTo(cx + arrowSize/2, arrowBaseY + oy);
+      }
+      ctx.closePath();
+      ctx.fill();
     }
-  }
-
-  public destroy(): void {
-    this.scene.input.off("pointerdown", this.onPointerDown);
-    this.scene.input.off("pointermove", this.onPointerMove);
-    this.scene.input.off("pointerup",   this.onPointerUp);
-    this.arrowBounceTween?.stop();
-    this.advanceTween?.stop();
-    this.lamp?.destroy();
-    this.bulbInsert?.destroy();
-    this.bulbBorder?.destroy();
-    this.arrows?.destroy();
-  }
-
-  public onResize(width: number, height: number): void {
-    this.cx = width / 2;
-    this.cy = height / 2;
-
-    this.threshold = height * TUNING.SWIPE_THRESHOLD_PCT;
-    this.socketY = height * LAYOUT.SOCKET_Y_PCT;
-    this.newBulbY = height * LAYOUT.NEW_BULB_Y_PCT;
-    
-    const {lampWidth, lampHeight, bulbSize } = this.computeSizes(width, height);
-    this.bulbSize = bulbSize;
-    this.lamp.setPosition(this.cx, this.cy).setDisplaySize(lampWidth, lampHeight);
-    this.bulbInsert?.setDisplaySize(bulbSize, bulbSize);
-    this.bulbBorder?.setDisplaySize(bulbSize, bulbSize);
-  }
-
-  private computeSizes(width: number, height: number) {
-    const narrow = width < LAYOUT.NARROW_WIDTH;
-    return {
-      lampWidth: width * (narrow ? LAYOUT.LAMP_WIDTH_PCT_NARROW : LAYOUT.LAMP_WIDTH_PCT),
-      lampHeight: height * (narrow ? LAYOUT.LAMP_HEIGHT_PCT_NARROW : LAYOUT.LAMP_HEIGHT_PCT),
-      bulbSize: width * (narrow ? LAYOUT.BULB_SIZE_PCT_NARROW : LAYOUT.BULB_SIZE_PCT),
-    };
   }
 }
