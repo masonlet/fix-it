@@ -24,5 +24,8 @@
     "@wvdsh/sdk-js": "^1.2.4",
     "typescript": "^6.0.3",
     "vite": "^5.4.8"
+  },
+  "dependencies": {
+    "web-engine": "github:masonlet/web-engine"
   }
 }
