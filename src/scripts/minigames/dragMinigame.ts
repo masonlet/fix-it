@@ -1,128 +1,152 @@
-import { DEPTH } from "../config/depth.ts";
-import type { MinigameScene } from "../game/types.ts";
+import {
+  isPointerDown,
+  wasPointerClicked,
+  wasPointerReleased,
+  pointerX,
+  pointerY
+} from "web-engine/input/pointer.ts";
+import { playSound       } from "web-engine/audio/playback.ts";
+import { tintImage       } from "web-engine/assets.ts";
+import type { GameAssets } from "../game/assets.ts";
+
 
 const LAYOUT = {
-  BG_SIZE_PCT:    0.50,
-  PIECE_SIZE_PCT: 0.10,
-  SLOT_SIZE_PCT:  0.12,
+  BG_SIZE_PCT:         0.50,
+  PIECE_SIZE_PCT:      0.10,
+  SLOT_SIZE_PCT:       0.12,
   START_OFFSET_X_PCT: -0.15,
   SLOT_OFFSET_X_PCT:   0.15,
   SNAP_TOLERANCE_PCT:  0.50,
 }
 
-export class DragMinigame {
-  private scene:      MinigameScene;
-  private onComplete: () => void;
-  private completed:  boolean;
+export interface DragState {
+  completed:       boolean;
+  dragging:        boolean;
+  dragOffsetX:     number;
+  dragOffsetY:     number;
+  pieceX:          number;
+  pieceY:          number;
+  startX:          number;
+  startY:          number;
+  slotX:           number;
+  slotY:           number;
+  snapTolerance:   number;
+  slotHighlighted: boolean;
+  bgSize:          number;
+  pieceSize:       number;
+  slotSize:        number;
+  cx:              number;
+  cy:              number;
+  slotTinted:      HTMLCanvasElement;
+}
 
-  private startX: number;
-  private startY: number;
-  private slotX:  number;
-  private slotY:  number;
-  private snapTolerance: number;
+export function createDragState(w: number, h: number, assets: GameAssets): DragState {
+  const cx        = w / 2;
+  const cy        = h / 2;
+  const bgSize    = w * LAYOUT.BG_SIZE_PCT;
+  const pieceSize = w * LAYOUT.PIECE_SIZE_PCT;
+  const slotSize  = w * LAYOUT.SLOT_SIZE_PCT;
+  const startX    = cx + w * LAYOUT.START_OFFSET_X_PCT;
+  const slotX     = cx + w * LAYOUT.SLOT_OFFSET_X_PCT;
 
-  private bg:    /*Phaser.GameObjects.Image*/;
-  private slot:  /*Phaser.GameObjects.Image*/;
-  private piece: /*Phaser.GameObjects.Image*/;
+  return {
+    completed: false, dragging: false,
+    dragOffsetX: 0, dragOffsetY: 0,
+    pieceX: startX, pieceY: cy,
+    startX, startY: cy,
+    slotX, slotY: cy,
+    snapTolerance: pieceSize * LAYOUT.SNAP_TOLERANCE_PCT,
+    slotHighlighted: false,
+    bgSize, pieceSize, slotSize, cx, cy,
+    slotTinted: tintImage(assets.minigames.drag.socket, "#00cc66"),
+  };
+}
 
-  private onDrag: (
-    pointer:    /*Phaser.Input.Pointer*/,
-    gameObject: /*Phaser.GameObjects.GameObject*/,
-    dragX: number,
-    dragY: number
-  ) => void;
-  private onDragEnd: (
-    pointer:    /*Phaser.Input.Pointer*/,
-    gameObject: /*Phaser.GameObjects.GameObject*/
-  ) => void;
+function hitPiece(state: DragState): boolean {
+  const half = state.pieceSize / 2;
+  const px = pointerX(), py = pointerY();
+  return px >= state.pieceX - half && px <= state.pieceX + half
+      && py >= state.pieceY - half && py <= state.pieceY + half;
+}
 
-  constructor (scene: MinigameScene, cx: number, cy: number, onComplete: () => void) {
-    this.scene = scene;
-    this.onComplete = onComplete;
-    this.completed = false;
+export function updateDrag(state: DragState, onComplete: () => void): DragState {
+  if (state.completed) return state;
+  const px = pointerX(), py = pointerY();
 
-    const { width } = scene.scale;
-    const bgSize = width * LAYOUT.BG_SIZE_PCT;
-    const pieceSize = width * LAYOUT.PIECE_SIZE_PCT;
-    const slotSize = width * LAYOUT.SLOT_SIZE_PCT;
-
-    this.startX = cx + width * LAYOUT.START_OFFSET_X_PCT;
-    this.startY = cy;
-    this.slotX = cx + width * LAYOUT.SLOT_OFFSET_X_PCT;
-    this.slotY = cy;
-    this.snapTolerance = pieceSize * LAYOUT.SNAP_TOLERANCE_PCT;
-
-    this.bg = scene.add.image(cx, cy, "drag-background")
-      .setDisplaySize(bgSize, bgSize)
-      .setDepth(DEPTH.MINIGAME);
-
-    this.slot = scene.add.image(this.slotX, this.slotY, "drag-socket")
-      .setDisplaySize(slotSize, slotSize)
-      .setDepth(DEPTH.MINIGAME);
-
-    this.piece = scene.add.image(this.startX, this.startY, "drag-plug")
-      .setDisplaySize(pieceSize, pieceSize)
-      .setDepth(DEPTH.MINIGAME)
-      .setInteractive({ draggable: true });
-
-    scene.input.setDraggable(this.piece);
-
-    this.onDrag = (_, obj, x, y) => {
-      if (obj !== this.piece) return;
-      this.piece.setPosition(x, y);
-      const dx = x - this.slotX;
-      const dy = y - this.slotY;
-      if (Math.hypot(dx, dy) <= this.snapTolerance) {
-        this.slot.setTint(0x00cc66);
-      } else {
-        this.slot.clearTint();
-      }
-    };
-    this.onDragEnd = (_, obj) => {
-      if (obj !== this.piece || this.completed) return;
-      const dx = this.piece.x - this.slotX;
-      const dy = this.piece.y - this.slotY;
-      if (Math.hypot(dx, dy) <= this.snapTolerance) {
-        this.completed = true;
-        this.piece.setPosition(this.slotX, this.slotY);
-        this.scene.audio.play("drag-connect");
-        this.onComplete();
-      } else {
-        this.piece.setPosition(this.startX, this.startY);
-      }
+  if (!state.dragging && wasPointerClicked() && hitPiece(state))
+    return {
+      ...state,
+      dragging: true,
+      dragOffsetX: px - state.pieceX,
+      dragOffsetY: py - state.pieceY
     };
 
-    scene.input.on("drag", this.onDrag);
-    scene.input.on("dragend", this.onDragEnd);
+  if (state.dragging && isPointerDown()) {
+    const pieceX = px - state.dragOffsetX;
+    const pieceY = py - state.dragOffsetY;
+    return {
+      ...state,
+      pieceX,
+      pieceY,
+      slotHighlighted: Math.hypot(pieceX - state.slotX, pieceY - state.slotY) <= state.snapTolerance
+    };
   }
 
-  public destroy(): void {
-    this.scene.input.off("drag", this.onDrag);
-    this.scene.input.off("dragend", this.onDragEnd);
-    this.bg.destroy();
-    this.piece.destroy();
-    this.slot.destroy();
+  if (state.dragging && wasPointerReleased()) {
+    const snapped = Math.hypot(state.pieceX - state.slotX, state.pieceY - state.slotY) <= state.snapTolerance;
+    if (snapped) {
+      playSound("drag-connect");
+      onComplete();
+      return {
+        ...state,
+        dragging: false,
+        completed: true,
+        slotHighlighted: false,
+        pieceX: state.slotX,
+        pieceY: state.slotY
+      };
+    }
+    return {
+      ...state,
+      dragging: false,
+      slotHighlighted: false,
+      pieceX: state.startX,
+      pieceY: state.startY
+    };
   }
 
-  public onResize(width: number, height: number): void {
-    const cx = width / 2;
-    const cy = height / 2;
-    const bgSize    = width * LAYOUT.BG_SIZE_PCT;
-    const pieceSize = width * LAYOUT.PIECE_SIZE_PCT;
-    const slotSize  = width * LAYOUT.SLOT_SIZE_PCT;
+  return state;
+}
 
-    this.startX = cx + width * LAYOUT.START_OFFSET_X_PCT;
-    this.startY = cy;
-    this.slotX  = cx + width * LAYOUT.SLOT_OFFSET_X_PCT;
-    this.slotY  = cy;
-    this.snapTolerance = pieceSize * LAYOUT.SNAP_TOLERANCE_PCT;
+export function resizeDrag(state: DragState, w: number, h: number): DragState {
+  const cx        = w / 2;
+  const cy        = h / 2;
+  const bgSize    = w * LAYOUT.BG_SIZE_PCT;
+  const pieceSize = w * LAYOUT.PIECE_SIZE_PCT;
+  const slotSize  = w * LAYOUT.SLOT_SIZE_PCT;
+  const startX    = cx + w * LAYOUT.START_OFFSET_X_PCT;
+  const slotX     = cx + w * LAYOUT.SLOT_OFFSET_X_PCT;
 
-    this.bg.setPosition(cx, cy).setDisplaySize(bgSize, bgSize);
-    this.slot.setPosition(this.slotX, this.slotY).setDisplaySize(slotSize, slotSize);
+  return {
+    ...state, cx, cy, bgSize, pieceSize, slotSize,
+    startX, startY: cy, slotX, slotY: cy,
+    snapTolerance: pieceSize * LAYOUT.SNAP_TOLERANCE_PCT,
+    pieceX: state.completed ? slotX : startX,
+    pieceY: cy,
+  };
+}
 
-    if (this.completed) this.piece.setPosition(this.slotX,  this.slotY);
-    else                this.piece.setPosition(this.startX, this.startY);
+function drawCentered(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement | HTMLCanvasElement,
+  x: number, y: number, w: number, h: number,
+): void {
+  ctx.drawImage(img, x - w / 2, y - h / 2, w, h);
+}
 
-    this.piece.setDisplaySize(pieceSize, pieceSize);
-  }
+export function renderDrag(ctx: CanvasRenderingContext2D, state: DragState, assets: GameAssets): void {
+  const { cx, cy, bgSize, slotSize, pieceSize, slotX, slotY, pieceX, pieceY, slotHighlighted } = state;
+  drawCentered(ctx, assets.minigames.drag.background, cx, cy, bgSize, bgSize);
+  drawCentered(ctx, slotHighlighted ? state.slotTinted : assets.minigames.drag.socket, slotX, slotY, slotSize, slotSize);
+  drawCentered(ctx, assets.minigames.drag.plug, pieceX, pieceY, pieceSize, pieceSize);
 }
