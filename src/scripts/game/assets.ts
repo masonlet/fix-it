@@ -8,8 +8,10 @@ export interface GameAssets {
     squareInsert:    HTMLImageElement;
     rectBorder:      HTMLImageElement;
     rectInsert:      HTMLImageElement;
-    rectInsertFault: HTMLCanvasElement;
-    rectInsertFixed: HTMLCanvasElement;
+    squareInsertFault: HTMLCanvasElement;
+    squareInsertFixed: HTMLCanvasElement;
+    rectInsertFault:   HTMLCanvasElement;
+    rectInsertFixed:   HTMLCanvasElement;
   };
   items: {
     background: HTMLImageElement;
@@ -77,8 +79,10 @@ export async function loadAssets(baseUrl: string): Promise<GameAssets> {
       squareInsert,
       rectBorder,
       rectInsert,
-      rectInsertFault: tintImage(rectInsert, "#ff4444"),
-      rectInsertFixed: tintImage(rectInsert, "#00cc66"),
+      squareInsertFault: tintImage(rectInsert, "#ff4444"),
+      squareInsertFixed: tintImage(rectInsert, "#00cc66"),
+      rectInsertFault:   tintImage(rectInsert, "#ff4444"),
+      rectInsertFixed:   tintImage(rectInsert, "#00cc66"),
     },
     items: { background: itemBg, gauge: itemGauge, light: itemLight, pipe: itemPipe, tire: itemTire, toaster: itemToaster, walkie: itemWalkie },
     minigames: {
