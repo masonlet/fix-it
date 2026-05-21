@@ -1,13 +1,15 @@
-import { loadImage } from "web-engine/assets.ts";
+import { loadImage, tintImage } from "web-engine/assets.ts";
 
 export interface GameAssets {
   game: {
-    belt:         HTMLImageElement;
-    life:         HTMLImageElement;
-    rectBorder:   HTMLImageElement;
-    rectInsert:   HTMLImageElement;
-    squareBorder: HTMLImageElement;
-    squareInsert: HTMLImageElement;
+    belt:            HTMLImageElement;
+    life:            HTMLImageElement;
+    squareBorder:    HTMLImageElement;
+    squareInsert:    HTMLImageElement;
+    rectBorder:      HTMLImageElement;
+    rectInsert:      HTMLImageElement;
+    rectInsertFault: HTMLCanvasElement;
+    rectInsertFixed: HTMLCanvasElement;
   };
   items: {
     background: HTMLImageElement;
@@ -68,7 +70,16 @@ export async function loadAssets(baseUrl: string): Promise<GameAssets> {
   ]);
 
   return {
-    game:  { belt, life, rectBorder, rectInsert, squareBorder, squareInsert },
+    game:  {
+      belt,
+      life,
+      squareBorder,
+      squareInsert,
+      rectBorder,
+      rectInsert,
+      rectInsertFault: tintImage(rectInsert, "#ff4444"),
+      rectInsertFixed: tintImage(rectInsert, "#00cc66"),
+    },
     items: { background: itemBg, gauge: itemGauge, light: itemLight, pipe: itemPipe, tire: itemTire, toaster: itemToaster, walkie: itemWalkie },
     minigames: {
       drag:   { background: dragBg, plug: dragPlug, socket: dragSocket },

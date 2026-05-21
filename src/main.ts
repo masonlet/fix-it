@@ -9,6 +9,7 @@ import { bootstrapGame              } from './scripts/game/game.ts';
 import { loadAssets                 } from './scripts/game/assets.ts';
 import { updateFrame, renderFrame   } from "./scripts/game/frame.ts";
 import type { FrameState, GameState } from "./scripts/game/types.ts";
+import { resizeItems } from './scripts/game/itemSpawner.ts';
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -74,4 +75,11 @@ YouTubePlayables.boot(async () => {
 
   YouTubePlayables.setOnPause (() => loop.pause());
   YouTubePlayables.setOnResume(() => loop.resume());
+
+  let lastW = canvas.width;
+  window.addEventListener("resize", () => {
+    const newW = canvas.width;
+    resizeItems(gameState, canvas.width, canvas.height, lastW);
+    lastW = newW;
+  });
 });
