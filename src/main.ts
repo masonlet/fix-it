@@ -1,36 +1,48 @@
+
+import { bootstrapGame } from './scripts/game/game.ts';
+import { registerSound    } from 'web-engine/audio/registry.ts';
+import { setMuted         } from 'web-engine/audio/mixer.ts';
+import { startLoop        } from 'web-engine/update.ts';
+
 import { YouTubePlayables } from './scripts/sdk/youTubePlayables.ts';
 import { WaveDash         } from './scripts/sdk/waveDash.ts';
-import { Boot      } from './scripts/scenes/boot.ts';
-import { Preloader } from './scripts/scenes/preloader.ts';
-import { MainMenu  } from './scripts/scenes/mainMenu.ts';
-import { Game      } from './scripts/scenes/game.ts';
-import { GameOver  } from './scripts/scenes/gameOver.ts';
 
-/*const config = {
-  type: Phaser.AUTO,
-  parent: 'gameParent',
-  backgroundColor: '#1a1a2e',
-  scale: {
-    mode: Phaser.Scale.RESIZE,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  },
-  scene: [
-    Boot,
-    Preloader,
-    MainMenu,
-    Game,
-    GameOver
-  ],
-  pixelArt: true,
-};*/
+import { updateFrame, renderFrame } from "./scripts/game/frame.ts";
+import type { FrameState          } from "./scripts/game/types.ts";
+
+const BASE_URL = import.meta.env.BASE_URL;
 
 YouTubePlayables.boot(async () => {
-  //const game = new Phaser.Game(config);
   await WaveDash.boot();
 
-  const applyAudioState = (enabled: boolean) => { /*game.sound.mute = !enabled;*/ }
-  applyAudioState(YouTubePlayables.isAudioEnabled());
-  YouTubePlayables.setAudioChangeCallback(applyAudioState);
+  const { canvas, ctx } = bootstrapGame();
 
-  //return game;
+  await Promise.all([
+    registerSound("button",          "assets/audio/button.wav",                    BASE_URL),
+    registerSound("click",           "assets/audio/click.wav",                     BASE_URL),
+    registerSound("death",           "assets/audio/death.wav",                     BASE_URL),
+    registerSound("oof",             "assets/audio/oof.wav",                       BASE_URL),
+    registerSound("drag-connect",    "assets/audio/minigames/drag/connect.wav",    BASE_URL),
+    registerSound("minigame-fail",   "assets/audio/minigames/fail.wav",            BASE_URL),
+    registerSound("pump-complete",   "assets/audio/minigames/pump/complete.wav",   BASE_URL),
+    registerSound("pump-down",       "assets/audio/minigames/pump/down.wav",       BASE_URL),
+    registerSound("spin-complete",   "assets/audio/minigames/spin/complete.wav",   BASE_URL),
+    registerSound("spin-spin",       "assets/audio/minigames/spin/spin.wav",       BASE_URL),
+    registerSound("swipe-complete",  "assets/audio/minigames/swipe/complete.wav",  BASE_URL),
+    registerSound("swipe-move",      "assets/audio/minigames/swipe/move.wav",      BASE_URL),
+    registerSound("tap-button",      "assets/audio/minigames/tap/button.wav",      BASE_URL),
+    registerSound("tap-complete",    "assets/audio/minigames/tap/complete.wav",    BASE_URL),
+    registerSound("timing-click",    "assets/audio/minigames/timing/click.wav",    BASE_URL),
+    registerSound("timing-complete", "assets/audio/minigames/timing/complete.wav", BASE_URL),
+  ]);
+
+  YouTubePlayables.setAudioChangeCallback((enabled) => setMuted(!enabled));
+  setMuted(!YouTubePlayables.isAudioEnabled());
+
+  let frame: FrameState = { game: "preloading" };
+  startLoop(
+    (dt) => { frame = updateFrame(canvas, frame, dt);  },
+    (  ) => { renderFrame(ctx, canvas, frame); },
+    { tickRate: "variable" },
+  );
 });
