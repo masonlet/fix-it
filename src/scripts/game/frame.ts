@@ -1,10 +1,11 @@
-import type { GameAssets } from "./assets.ts";
-import type { FrameState } from "./types.ts";
+import type { GameAssets            } from "./assets.ts";
+import type { FrameState, GameState } from "./types.ts";
 
 export function updateFrame(
-  canvas: HTMLCanvasElement,
-  frame:  FrameState,
-  dt:     number,
+  canvas:    HTMLCanvasElement,
+  frame:     FrameState,
+  gameState: GameState,
+  dt:        number,
 ): FrameState {
   switch (frame.game) {
     case "menu-main":  return frame;
@@ -14,10 +15,11 @@ export function updateFrame(
 }
 
 export function renderFrame(
-  ctx:    CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
-  assets: GameAssets,
-  frame:  FrameState,
+  ctx:       CanvasRenderingContext2D,
+  canvas:    HTMLCanvasElement,
+  assets:    GameAssets,
+  gameState: GameState,
+  frame:     FrameState,
 ): void {
   switch (frame.game) {
     case "menu-main":  break;

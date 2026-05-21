@@ -1,29 +1,29 @@
-//import { Scene } from "phaser";
+export interface Indicator {
+  faultType: string;
+  fixed:     boolean;
+}
 
 export interface ActiveItem {
   paused?:     boolean;
   faults:      number;
   totalFaults: number;
   faultTypes:  string[];
-  indicators:  Array<{ insert: /*Phaser.GameObjects.Image*/ }>;
+  x:           number;
+  y:           number;
+  size:        number;
+  indicators:  Indicator[];
 }
 
-export interface GameInitData {
-  score?: number;
-  time?:  number;
-}
-
-export interface SoundInstance {
-  isPlaying: boolean;
-}
-
-export interface MinigameScene /*extends Scene*/ {
-  audio: {
-    play(key: string, config?: Record<string, unknown>): unknown;
-    stop(key: string): unknown;
-    sounds: Record<string, SoundInstance | undefined>;
-  };
-  onFixComplete?(result: { fixed: boolean; complete: boolean; item: any }): void;
+export interface GameState {
+  score:         number;
+  lives:         number;
+  elapsedTime:  number;
+  beltSpeed:     number;
+  spawnTimer:    number;
+  spawnInterval: number;
+  highScore:     number | null;
+  items:         ActiveItem[];
+  minigame:      null;
 }
 
 export type FrameState = { game: "menu-main"  }

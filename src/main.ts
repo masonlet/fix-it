@@ -4,10 +4,11 @@ import { setMuted         } from 'web-engine/audio/mixer.ts';
 import { startLoop        } from 'web-engine/update.ts';
 import { YouTubePlayables } from './scripts/sdk/youTubePlayables.ts';
 import { WaveDash         } from './scripts/sdk/waveDash.ts';
-import { bootstrapGame            } from './scripts/game/game.ts';
-import { loadAssets               } from './scripts/game/assets.ts';
-import { updateFrame, renderFrame } from "./scripts/game/frame.ts";
-import type { FrameState          } from "./scripts/game/types.ts";
+import { GAME                       } from './scripts/config/game.ts';
+import { bootstrapGame              } from './scripts/game/game.ts';
+import { loadAssets                 } from './scripts/game/assets.ts';
+import { updateFrame, renderFrame   } from "./scripts/game/frame.ts";
+import type { FrameState, GameState } from "./scripts/game/types.ts";
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -49,10 +50,23 @@ YouTubePlayables.boot(async () => {
   YouTubePlayables.setAudioChangeCallback((enabled) => setMuted(!enabled));
   setMuted(!YouTubePlayables.isAudioEnabled());
 
+  const gameState: GameState = {
+    score:         0,
+    lives:         GAME.TUNING.LIVES_START,
+    elapsedTime:   0,
+    beltSpeed:     1,
+    spawnTimer:    0,
+    spawnInterval: GAME.TUNING.SPAWN_INTERVAL_START,
+    highScore,
+    items:         [],
+    minigame:      null,
+  };
+
   let frame: FrameState = { game: "menu-main" };
+
   startLoop(
-    (dt) => { frame = updateFrame(canvas, frame, dt);  },
-    (  ) => { renderFrame(ctx, canvas, assets, frame); },
+    (dt) => { frame = updateFrame(canvas, frame, gameState, dt);  },
+    (  ) => { renderFrame(ctx, canvas, assets, gameState, frame); },
     { tickRate: "variable" },
   );
 });
