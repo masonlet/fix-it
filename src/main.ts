@@ -5,11 +5,13 @@ import { startLoop        } from 'web-engine/update.ts';
 import { YouTubePlayables } from './scripts/sdk/youTubePlayables.ts';
 import { WaveDash         } from './scripts/sdk/waveDash.ts';
 import { GAME                       } from './scripts/config/game.ts';
+import { MINIGAME                   } from './scripts/config/minigame.ts';
+import { resizeItems                } from './scripts/game/itemSpawner.ts';
+import { resizeMinigame             } from './scripts/game/minigameManager.ts';
 import { bootstrapGame              } from './scripts/game/game.ts';
 import { loadAssets                 } from './scripts/game/assets.ts';
 import { updateFrame, renderFrame   } from "./scripts/game/frame.ts";
 import type { FrameState, GameState } from "./scripts/game/types.ts";
-import { resizeItems } from './scripts/game/itemSpawner.ts';
 
 const BASE_URL = import.meta.env.BASE_URL;
 
@@ -63,6 +65,7 @@ YouTubePlayables.boot(async () => {
     highScore,
     items:         [],
     minigame:      null,
+    minigameTimeMax: MINIGAME.TUNING.TIME_MAX_START,
   };
 
   let frame: FrameState = { game: "menu-main", ui: null };
@@ -80,6 +83,7 @@ YouTubePlayables.boot(async () => {
   window.addEventListener("resize", () => {
     const newW = canvas.width;
     resizeItems(gameState, canvas.width, canvas.height, lastW);
+    resizeMinigame(gameState, canvas.width, canvas.height);
     lastW = newW;
   });
 });

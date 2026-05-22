@@ -1,183 +1,144 @@
-import { DEPTH }     from "../config/depth.ts";
-import { POPUP }     from "../config/popup.ts";
-import { TIMER }     from "../config/timer.ts";
-import { INDICATOR } from "../config/indicator.ts";
+import { playSound } from "web-engine/audio/playback.ts";
+import type { GameState, ActiveItem, InnerMinigame } from "./types.ts";
+import type { GameAssets                           } from "./assets.ts";
+import { POPUP                                     } from "../config/popup.ts";
+import { TIMER                                     } from "../config/timer.ts";
+import { MINIGAME_TYPES                            } from "../config/minigameTypes.ts";
+import { createDragState,   updateDrag,   resizeDrag,   renderDrag   } from "../minigames/dragMinigame.ts";
+import { createTapState,    updateTap,    resizeTap,    renderTap    } from "../minigames/tapMinigame.ts";
+import { createPumpState,   updatePump,   resizePump,   renderPump   } from "../minigames/pumpMinigame.ts";
+import { createSpinState,   updateSpin,   resizeSpin,   renderSpin   } from "../minigames/spinMinigame.ts";
+import { createSwipeState,  updateSwipe,  resizeSwipe,  renderSwipe  } from "../minigames/swipeMinigame.ts";
+import { createTimingState, updateTiming, resizeTiming, renderTiming } from "../minigames/timingMinigame.ts";
 
-import { MINIGAME }       from "../config/minigame.ts";
-import { MINIGAME_TYPES } from "../config/minigameTypes.ts";
+function hexColor(n: number): string { return `#${n.toString(16).padStart(6, "0")}`; }
 
-import type { MinigameScene, ActiveItem } from "./types.ts";
-import { TapMinigame }    from "../minigames/tapMinigame.ts";
-import { PumpMinigame }   from "../minigames/pumpMinigame.ts";
-import { DragMinigame }   from "../minigames/dragMinigame.ts";
-import { SpinMinigame }   from "../minigames/spinMinigame.ts";
-import { SwipeMinigame }  from "../minigames/swipeMinigame.ts";
-import { TimingMinigame } from "../minigames/timingMinigame.ts";
+export function openMinigame(
+  gameState: GameState,
+  item: ActiveItem,
+  assets: GameAssets,
+  w: number, h: number
+): void {
+  playSound("click");
+  item.paused = true;
 
-interface MinigameInstance {
-  destroy(): void;
-  update?(delta: number): void;
-  onResize?(width: number, height: number): void;
+  const faultType = item.faultTypes[item.totalFaults - item.faults] ?? "";
+  let inner: InnerMinigame;
+  switch (faultType) {
+    case MINIGAME_TYPES.DRAG:   inner = { type: "drag",   state: createDragState  (w, h, assets) }; break;
+    case MINIGAME_TYPES.TAP:    inner = { type: "tap",    state: createTapState   (w, h)         }; break;
+    case MINIGAME_TYPES.PUMP:   inner = { type: "pump",   state: createPumpState  (w, h)         }; break;
+    case MINIGAME_TYPES.SPIN:   inner = { type: "spin",   state: createSpinState  (w, h)         }; break;
+    case MINIGAME_TYPES.SWIPE:  inner = { type: "swipe",  state: createSwipeState (w, h)         }; break;
+    case MINIGAME_TYPES.TIMING: inner = { type: "timing", state: createTimingState(w, h)         }; break;
+    default: return;
+  }
+
+  gameState.minigame = {
+    item,
+    timeLeft: gameState.minigameTimeMax,
+    timeMax: gameState.minigameTimeMax,
+    inner
+  };
 }
 
-type MinigameConstructor = new (
-  scene: MinigameScene,
-  cx: number,
-  cy: number,
-  onComplete: () => void,
-  onFail: () => void
-) => MinigameInstance;
+function fixMinigame(gameState: GameState, onFixed: (item: ActiveItem) => void): void {
+  const mg = gameState.minigame;
+  if (!mg) return;
+  const item = mg.item;
+  item.faults--;
+  const fixedIndex = item.totalFaults - item.faults - 1;
+  if (item.indicators[fixedIndex]) item.indicators[fixedIndex]!.fixed = true;
+  if (item.faults <= 0) onFixed(item);
+  else item.paused = false;
+  closeMinigame(gameState);
+}
 
-const MINIGAMES: Record<string, MinigameConstructor> = {
-  [MINIGAME_TYPES.TAP]: TapMinigame,
-  [MINIGAME_TYPES.PUMP]: PumpMinigame,
-  [MINIGAME_TYPES.DRAG]: DragMinigame,
-  [MINIGAME_TYPES.SPIN]: SpinMinigame,
-  [MINIGAME_TYPES.SWIPE]: SwipeMinigame,
-  [MINIGAME_TYPES.TIMING]: TimingMinigame,
-};
+export function failMinigame(gameState: GameState): void {
+  const mg = gameState.minigame;
+  if (!mg) return;
+  playSound("minigame-fail");
+  mg.item.paused = false;
+  closeMinigame(gameState);
+}
 
-export class MinigameManager {
-  private scene:    MinigameScene;
-  private timeMax:  number;
-  private timeLeft: number;
-  private activeItem:      ActiveItem       | null;
-  private currentMinigame: MinigameInstance | null;
-  
-  private overlay:    /*Phaser.GameObjects.Rectangle*/ | null;
-  private popup:      /*Phaser.GameObjects.Rectangle*/ | null;
-  private timerBarBg: /*Phaser.GameObjects.Rectangle*/ | null;
-  private timerBar:   /*Phaser.GameObjects.Rectangle*/ | null;
+export function closeMinigame(gameState: GameState): void {
+  gameState.minigame = null;
+}
 
-  constructor(scene: MinigameScene) {
-    this.scene           = scene;
-    this.activeItem      = null;
-    this.currentMinigame = null;
-    this.overlay         = null;
-    this.popup           = null;
-    this.timerBarBg      = null;
-    this.timerBar        = null;
-    this.timeLeft        = 0;
-    this.timeMax         = MINIGAME.TUNING.TIME_MAX_START;
-  }
+export function updateMinigame(
+  gameState: GameState,
+  dt:        number,
+  onFixed:   (item: ActiveItem) => void,
+): void {
+  const mg = gameState.minigame;
+  if (!mg) return;
 
-  public get isActive(): boolean {
-    return this.activeItem !== null;
-  }
+  mg.timeLeft -= dt;
+  if (mg.timeLeft <= 0) { failMinigame(gameState); return; }
 
-  public open(item: ActiveItem): void {
-    const { width, height } = this.scene.scale;
-    this.activeItem = item;
-    this.scene.audio.play('click');
-    item.paused = true;
+  const onComplete = () => fixMinigame(gameState, onFixed);
+  const onFail     = () => failMinigame(gameState);
+  const inner      = mg.inner;
 
-    // Overlay
-    this.overlay = this.scene.add.rectangle(
-      width / 2, height / 2, width, height,
-      POPUP.COLOUR.OVERLAY_FILL, POPUP.COLOUR.OVERLAY_ALPHA
-    ).setDepth(DEPTH.OVERLAY);
-
-    // Timer
-    const barWidth   = width * TIMER.LAYOUT.BAR_WIDTH_PCT;
-    const barHeight  = height * TIMER.LAYOUT.BAR_HEIGHT_PCT;
-    const barYOffset = height * TIMER.LAYOUT.BAR_Y_OFFSET_PCT;
-    this.timerBarBg  = this.scene.add.rectangle(
-      width / 2, height - barYOffset,
-      barWidth, barHeight,
-      TIMER.COLOUR.BG_FILL
-    ).setStrokeStyle(TIMER.LAYOUT.BAR_STROKE_WIDTH, TIMER.COLOUR.BG_STROKE)
-     .setDepth(DEPTH.TIMER_BG);
-
-    this.timerBar = this.scene.add.rectangle(
-      width / 2 - barWidth / 2, height - barYOffset,
-      barWidth, barHeight,
-      TIMER.COLOUR.BAR_FILL
-    ).setOrigin(0, 0.5).setDepth(DEPTH.TIMER_BAR);
-
-    // Minigame
-    const minigameType  = item.faultTypes[item.totalFaults - item.faults] as keyof typeof MINIGAMES;
-    const MinigameClass = MINIGAMES[minigameType];
-    if (!MinigameClass) throw new Error("Invalid minigame type");
-
-    this.currentMinigame = new MinigameClass(
-      this.scene,
-      width / 2, height / 2,
-      () => this.fix(),
-      () => this.fail()
-    );
-
-    this.timeLeft = this.timeMax;
-  }
-
-  public update(delta: number): { failed: boolean } | null {
-    if (!this.activeItem || this.timeLeft <= 0) return null;
-    if (this.currentMinigame?.update) this.currentMinigame.update(delta);
-    if (!this.activeItem) return null;
-
-    this.timeLeft -= delta / 1000;
-    const pct = Math.max(0, this.timeLeft / this.timeMax);
-    this.timerBar?.setScale(pct, 1);
-
-    if (this.timeLeft <= 0) {
-      this.fail();
-      return { failed: true };
-    }
-
-    return null;
-  }
-
-  public fix(): { fixed: boolean; complete: boolean; item: ActiveItem } | undefined {
-    if (!this.activeItem) return;
-
-    const item = this.activeItem;
-    item.faults--;
-
-    const fixedIndex = item.totalFaults - item.faults - 1;
-    if (item.indicators[fixedIndex]) item.indicators[fixedIndex].insert.setTint(INDICATOR.COLOUR.FIXED);
-
-    const result = { fixed: true, complete: item.faults <= 0, item };
-    if (!result.complete) item.paused = false;
-    else if (this.scene.onFixComplete) this.scene.onFixComplete(result);
-
-    this.close();
-    return result;
-  }
-
-  public fail (): void {
-    if (!this.activeItem) return;
-    this.scene.audio.play("fail");
-    this.activeItem.paused = false;
-    this.close();
-  }
-
-  public close (): void {
-    this.overlay?.destroy();    this.overlay = null;
-    this.popup?.destroy();      this.popup  = null;
-    this.timerBarBg?.destroy(); this.timerBarBg = null;
-    this.timerBar?.destroy();   this.timerBar = null;
-    this.activeItem = null;
-    if (this.currentMinigame) {
-      this.currentMinigame.destroy();
-      this.currentMinigame = null;
-    }
-  }
-
-  public set maxTime(value: number) { this.timeMax = value; }
-
-  public handleResize(width: number, height: number): void {
-    if (!this.activeItem) return;
-    const barWidth = width * TIMER.LAYOUT.BAR_WIDTH_PCT;
-    const barHeight = height * TIMER.LAYOUT.BAR_HEIGHT_PCT;
-    const barYOffset = height * TIMER.LAYOUT.BAR_Y_OFFSET_PCT;
-    this.overlay?.setPosition(width / 2, height / 2).setSize(width, height);
-    this.popup?.setPosition(width / 2, height / 2).setSize(
-      width * POPUP.LAYOUT.WIDTH_PCT, height * POPUP.LAYOUT.HEIGHT_PCT
-    );
-    this.timerBarBg?.setPosition(width / 2, height - barYOffset).setSize(barWidth, barHeight);
-    this.timerBar?.setPosition(width / 2 - barWidth / 2, height - barYOffset).setSize(barWidth, barHeight);
-    const pct = Math.max(0, this.timeLeft / this.timeMax);
-    this.timerBar?.setScale(pct, 1);
-    this.currentMinigame?.onResize?.(width, height);
+  switch (inner.type) {
+    case "drag":   mg.inner = { type: "drag",   state: updateDrag  (inner.state, onComplete)             }; break;
+    case "tap":    mg.inner = { type: "tap",    state: updateTap   (inner.state, onComplete)             }; break;
+    case "pump":   mg.inner = { type: "pump",   state: updatePump  (inner.state, dt, onComplete)         }; break;
+    case "spin":   mg.inner = { type: "spin",   state: updateSpin  (inner.state, dt, onComplete)         }; break;
+    case "swipe":  mg.inner = { type: "swipe",  state: updateSwipe (inner.state, dt, onComplete)         }; break;
+    case "timing": mg.inner = { type: "timing", state: updateTiming(inner.state, dt, onComplete, onFail) }; break;
   }
 }
 
+export function resizeMinigame(gameState: GameState, w: number, h: number): void {
+  const mg = gameState.minigame;
+  if (!mg) return;
+  const inner = mg.inner;
+  switch (inner.type) {
+    case "drag":   mg.inner = { type: "drag",   state: resizeDrag  (inner.state, w, h) }; break;
+    case "tap":    mg.inner = { type: "tap",    state: resizeTap   (inner.state, w, h) }; break;
+    case "pump":   mg.inner = { type: "pump",   state: resizePump  (inner.state, w, h) }; break;
+    case "spin":   mg.inner = { type: "spin",   state: resizeSpin  (inner.state, w, h) }; break;
+    case "swipe":  mg.inner = { type: "swipe",  state: resizeSwipe (inner.state, w, h) }; break;
+    case "timing": mg.inner = { type: "timing", state: resizeTiming(inner.state, w, h) }; break;
+  }
+}
+
+export function renderMinigame(
+  ctx:       CanvasRenderingContext2D,
+  gameState: GameState,
+  assets:    GameAssets,
+  w:         number,
+  h:         number,
+): void {
+  const mg = gameState.minigame;
+  if (!mg) return;
+
+  ctx.fillStyle = `rgba(0,0,0,${POPUP.COLOUR.OVERLAY_ALPHA})`;
+  ctx.fillRect(0, 0, w, h);
+
+  const barW = w * TIMER.LAYOUT.BAR_WIDTH_PCT;
+  const barH = h * TIMER.LAYOUT.BAR_HEIGHT_PCT;
+  const barY = h - h * TIMER.LAYOUT.BAR_Y_OFFSET_PCT;
+  const barX = w / 2 - barW / 2;
+  const pct  = Math.max(0, mg.timeLeft / mg.timeMax);
+
+  ctx.fillStyle = hexColor(TIMER.COLOUR.BG_FILL);
+  ctx.fillRect(barX, barY - barH/2, barW, barH);
+  ctx.strokeStyle = hexColor(TIMER.COLOUR.BG_STROKE);
+  ctx.lineWidth = TIMER.LAYOUT.BAR_STROKE_WIDTH;
+  ctx.strokeRect(barX, barY - barH/2, barW, barH);
+  ctx.fillStyle = hexColor(TIMER.COLOUR.BAR_FILL);
+  ctx.fillRect(barX, barY - barH/2, barW * pct, barH);
+
+  const inner = mg.inner;
+  switch (inner.type) {
+    case "drag":   renderDrag  (ctx, inner.state, assets); break;
+    case "tap":    renderTap   (ctx, inner.state, assets); break;
+    case "pump":   renderPump  (ctx, inner.state, assets); break;
+    case "spin":   renderSpin  (ctx, inner.state, assets); break;
+    case "swipe":  renderSwipe (ctx, inner.state, assets); break;
+    case "timing": renderTiming(ctx, inner.state, assets); break;
+  }
+}
