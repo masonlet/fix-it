@@ -62,6 +62,8 @@ export interface MainMenuState {
   gameReadyCalled: boolean;
 }
 
+export interface PlayState { initialized: boolean; }
+
 export type FrameState = { game: "menu-main"; ui: MainMenuState | null }
-                       | { game: "playing";   ui: null }
+                       | { game: "playing";   ui: PlayState     | null }
                        | { game: "game-over"; ui: GameOverState | null }
