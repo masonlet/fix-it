@@ -72,7 +72,7 @@ YouTubePlayables.boot(async () => {
   let frame: FrameState = { game: "menu-main", ui: null };
 
   const loop = startLoop(
-    (dt) => { frame = updateFrame(canvas, frame, gameState, assets, dt);  },
+    (dt) => { frame = updateFrame(canvas, frame, gameState, assets, dt / 1000);  },
     (  ) => { renderFrame(ctx, canvas, assets, gameState, frame); },
     { tickRate: "variable" },
   );
