@@ -1,3 +1,4 @@
+import "./style.css";
 
 import { registerSound    } from 'web-engine/audio/registry.ts';
 import { setMuted         } from 'web-engine/audio/mixer.ts';
